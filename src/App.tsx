@@ -23,8 +23,8 @@ const App = () => {
       <Header />
       <MainContainer>
         <Routes>
-          <Route path="/home2" element={<Home2 />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home2 />} />
+          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/categories" element={<Categories />} />
         </Routes>

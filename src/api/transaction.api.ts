@@ -7,23 +7,37 @@ export const addTransactions = async (transaction: any) => {
 interface TransactionParams {
   from: number;
   to: number;
+  startDate: string | null;
+  endDate: string | null;
 }
 
-export const getTransactions = async ({ from, to }: TransactionParams) => {
-  console.log({ from, to });
+export const getTransactions = async ({
+  from,
+  to,
+  startDate,
+  endDate,
+}: TransactionParams) => {
   return await supabase
     .from("transactions")
     .select("*,categories(*),sub_categories(*)", { count: "exact" })
+    .lte("transaction_date", endDate)
+    .gte("transaction_date", startDate)
     .eq("is_deleted", false)
     .range(from, to)
     .order("id", { ascending: false });
 };
 
+interface TransactionSumParams {
+  type: "INCOME" | "EXPENSE";
+  start_date: string;
+  end_date: string;
+}
+
 export const getTransactionsSumByCategories = async ({
   type,
   start_date,
   end_date,
-}) => {
+}: TransactionSumParams) => {
   return await supabase.rpc("categories_sum_by_date", {
     transaction_type: type,
     start_date: start_date,

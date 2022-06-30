@@ -20,15 +20,15 @@ import isMobile from "is-mobile";
 import AddCategoryModal from "./addCategoryModal";
 import tw from "twin.macro";
 
-interface AddTransactionModalProps {
+interface EditTransactionModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const AddTransactionModal = ({
+const EditTransactionModal = ({
   visible,
   onClose,
-}: AddTransactionModalProps) => {
+}: EditTransactionModalProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
@@ -196,4 +196,4 @@ const AddTransactionModal = ({
   );
 };
 
-export default AddTransactionModal;
+export default EditTransactionModal;

@@ -7,35 +7,53 @@ import AddTransactionDrawer from "../components/addTransactionDrawer";
 import { TransactionCard } from "../styles/transactions.style.";
 import { getTransactions } from "../api/transaction.api";
 import getPagination from "../utils/getPagination";
+import EditTransactionModal from "../components/editTransactionModal";
+
+type TDateRange = [moment.Moment | null, moment.Moment | null];
 
 const Transactions = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAddDrawer, setIsAddDrawer] = useState(false);
+  const [isEditDrawer, setIsEditDrawer] = useState(false);
+
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedDateRange, setSelectedDateRange] = useState<TDateRange>([
+    null,
+    null,
+  ]);
 
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
-
   const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
     getData();
-  }, [pagination.current]);
+  }, [pagination.current, selectedDateRange]);
 
   useEffect(() => {
-    if (!isModalVisible) {
+    if (!isAddDrawer) {
       getData();
     }
-  }, [isModalVisible]);
+  }, [isAddDrawer]);
 
   const getData = async () => {
     setLoading(true);
     const { from, to } = getPagination(pagination.current, pagination.pageSize);
-    console.log(from, to);
-    const { data, error, count } = await getTransactions({ from, to });
+    //if range is null set a default date
+    const { data, error, count } = await getTransactions({
+      from,
+      to,
+      startDate: selectedDateRange[0]
+        ? selectedDateRange[0].format("YYYY-MM-DD")
+        : moment("2000-01-01").format("YYYY-MM-DD"),
+      endDate: selectedDateRange[1]
+        ? selectedDateRange[1].format("YYYY-MM-DD")
+        : moment().format("YYYY-MM-DD"),
+    });
+    console.log(data);
     setPagination((old) => ({ ...old, total: count }));
     setTransactions(data);
     setLoading(false);
@@ -44,15 +62,19 @@ const Transactions = () => {
   return (
     <>
       <AddTransactionDrawer
-        visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        visible={isAddDrawer}
+        onClose={() => setIsAddDrawer(false)}
+      />
+      <EditTransactionModal
+        visible={isEditDrawer}
+        onClose={() => setIsEditDrawer(false)}
       />
       <div tw="flex justify-between items-center mb-6">
         <h2 tw="font-medium text-base mb-6"> Transactions</h2>
         <Button
           type="primary"
           size="large"
-          onClick={() => setIsModalVisible(true)}
+          onClick={() => setIsAddDrawer(true)}
         >
           Add New Transaction
         </Button>
@@ -60,7 +82,8 @@ const Transactions = () => {
       <div tw="flex mb-6 justify-end">
         <DatePicker.RangePicker
           tw="rounded-lg "
-          defaultValue={[moment(), moment()]}
+          value={selectedDateRange}
+          onChange={(date) => setSelectedDateRange(date || [null, null])}
           ranges={DateRanges() as any}
           format={DATE_FORMAT}
           showTime
