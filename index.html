@@ -6,6 +6,7 @@
   <link rel="icon" type="image/png" href="/src/assets/app_icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="apple-touch-icon" href="/src/assets/app_icon.png" sizes="180x180">
+  <link rel="manifest" href="/manifest.json" />
   <title>Albanan Expense</title>
 </head>
 
@@ -16,7 +17,6 @@
   <script type="module" src="/src/main.tsx"></script>
   <script>
     if ('serviceWorker' in navigator) {
-
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
           .then((reg) => console.log('Success: ', reg.scope))
