@@ -20,21 +20,13 @@ import {
 } from "../api/transaction.api";
 import { useEffect, useState } from "react";
 import { getCategories, getSubCategories } from "../api/category.api";
-import isMobile from "is-mobile";
-import AddCategoryModal from "./addCategoryModal";
+import AddCategoryModal from "../components/addCategoryModal";
 import tw from "twin.macro";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
-interface EditTransactionModalProps {
-  visible: boolean;
-  onClose: () => void;
-  id: number | null;
-}
-
-const EditTransactionModal = ({
-  visible,
-  onClose,
-  id,
-}: EditTransactionModalProps) => {
+const EditTransactions = () => {
+  const transactionId = useLocation().pathname.split("/")[2];
   const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
@@ -42,22 +34,15 @@ const EditTransactionModal = ({
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<any>(null);
-  const [transactionId, setTransactionId] = useState<number | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setTransactionId(null);
-    if (id) {
-      setTransactionId(id);
-    }
-  }, [id, visible]);
-
-  useEffect(() => {
-    setTransactionData(null);
-    if (transactionId) {
-      getTransactionData();
-    }
+    setLoading(true);
     getCategoriesData();
-  }, [visible, addCategoryModalVisible, transactionId]);
+    if (transactionId) getTransactionData();
+    setLoading(false);
+  }, [transactionId]);
 
   const getCategoriesData = async () => {
     const { data: categories } = await getCategories();
@@ -68,7 +53,13 @@ const EditTransactionModal = ({
     let { data } = await getSingleTransaction(transactionId);
     data = data[0] || {};
     data = { ...data, transaction_date: moment(data.transaction_date) };
+    getSubCategoriesById(data.category);
     setTransactionData(data);
+  };
+
+  const getSubCategoriesById = async (item) => {
+    const subCategoriesResponse = await getSubCategories(item);
+    setSubCategories(subCategoriesResponse.data);
   };
 
   const onFinish = async (values: any) => {
@@ -78,22 +69,20 @@ const EditTransactionModal = ({
       message.error("Something went wrong");
     } else {
       message.success("Transaction updated successfully");
-      setTransactionData(null);
-      onClose();
     }
     setLoading(false);
   };
 
   return (
-    <Modal
-      width={isMobile() ? "100%" : "70%"}
-      title="Edit Transaction"
-      onCancel={() => {
-        form.resetFields();
-        onClose();
-      }}
-      visible={visible}
-    >
+    <>
+      <Button
+        icon={<ArrowLeftOutlined />}
+        size="medium"
+        style={{ marginBottom: "20px" }}
+        onClick={() => navigate("/transactions")}
+      >
+        Back
+      </Button>
       <AddCategoryModal
         onClose={() => {
           setAddCategoryModalVisible(false);
@@ -138,10 +127,7 @@ const EditTransactionModal = ({
                   optionFilterProp="children"
                   showSearch
                   size="large"
-                  onChange={async (item) => {
-                    const subCategoriesResponse = await getSubCategories(item);
-                    setSubCategories(subCategoriesResponse.data);
-                  }}
+                  onChange={async (item) => await getSubCategoriesById(item)}
                   style={{ textTransform: "capitalize" }}
                 >
                   {categories.map((item) => (
@@ -223,8 +209,8 @@ const EditTransactionModal = ({
       ) : (
         <div>Loading...</div>
       )}
-    </Modal>
+    </>
   );
 };
 
-export default EditTransactionModal;
+export default EditTransactions;

@@ -8,25 +8,27 @@ import { TransactionCard } from "../styles/transactions.style.";
 import { getTransactions } from "../api/transaction.api";
 import getPagination from "../utils/getPagination";
 import EditTransactionModal from "../components/editTransactionModal";
+import { useNavigate } from "react-router-dom";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
 
 const Transactions = () => {
+  //TODO FIX EDIT MODAL ISSUE
   const [isAddDrawer, setIsAddDrawer] = useState(false);
-  const [isEditDrawer, setIsEditDrawer] = useState(false);
-
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState<TDateRange>([
     null,
     null,
   ]);
+  const [transactionId, setTransactionId] = useState<number | null>(null);
 
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
+  const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
@@ -34,10 +36,10 @@ const Transactions = () => {
   }, [pagination.current, selectedDateRange]);
 
   useEffect(() => {
-    if (!isAddDrawer) {
+    if (!isAddDrawer && !transactionId) {
       getData();
     }
-  }, [isAddDrawer]);
+  }, [isAddDrawer, transactionId]);
 
   const getData = async () => {
     setLoading(true);
@@ -53,7 +55,6 @@ const Transactions = () => {
         ? selectedDateRange[1].format("YYYY-MM-DD")
         : moment().format("YYYY-MM-DD"),
     });
-    console.log(data);
     setPagination((old) => ({ ...old, total: count }));
     setTransactions(data);
     setLoading(false);
@@ -65,10 +66,7 @@ const Transactions = () => {
         visible={isAddDrawer}
         onClose={() => setIsAddDrawer(false)}
       />
-      <EditTransactionModal
-        visible={isEditDrawer}
-        onClose={() => setIsEditDrawer(false)}
-      />
+
       <div tw="flex justify-between items-center mb-6">
         <h2 tw="font-medium text-base mb-6"> Transactions</h2>
         <Button
@@ -100,7 +98,13 @@ const Transactions = () => {
             ...pagination,
           }}
           renderItem={(item) => (
-            <TransactionCard type={item.type.toLowerCase()} key={item.id}>
+            <TransactionCard
+              type={item.type.toLowerCase()}
+              key={item.id}
+              onClick={() => {
+                navigate(`/transactions/${item.id}`);
+              }}
+            >
               <div className="title-container">
                 <div className="image">
                   {item.categories.emoji || item.categories.name.charAt(0)}

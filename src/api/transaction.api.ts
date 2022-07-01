@@ -27,6 +27,18 @@ export const getTransactions = async ({
     .order("id", { ascending: false });
 };
 
+export const getSingleTransaction = async (id: number) => {
+  return await supabase
+    .from("transactions")
+    .select("*,categories(*),sub_categories(*)")
+    .eq("id", id)
+    .eq("is_deleted", false);
+};
+
+export const updateSingleTransaction = async (id: number, transaction: any) => {
+  return await supabase.from("transactions").update(transaction).match({ id });
+};
+
 interface TransactionSumParams {
   type: "INCOME" | "EXPENSE";
   start_date: string;
