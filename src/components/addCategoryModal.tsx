@@ -25,13 +25,13 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
   }, [visible]);
 
   const getData = async () => {
-    const { data: categories } = await getCategories();
+    const { data: categories }: any = await getCategories();
     setCategories(categories);
   };
 
   const onCategoryFinish = async (values: any) => {
     let emojies = search(values.name);
-    let categoryObject = {
+    let categoryObject: any = {
       name: values.name,
       emoji: emojies.length > 0 ? emojies[0].char : null,
     };
@@ -97,7 +97,7 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
                 setIsCategorySelected(true);
               }}
             >
-              {categories.map((item) => (
+              {categories.map((item: any) => (
                 <Select.Option key={item.id} value={item.id}>
                   {item.name}
                 </Select.Option>

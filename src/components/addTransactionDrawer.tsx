@@ -41,7 +41,7 @@ const AddTransactionModal = ({
   }, [visible, addCategoryModalVisible]);
 
   const getData = async () => {
-    const { data: categories } = await getCategories();
+    const { data: categories }: any = await getCategories();
     setCategories(categories);
   };
 
@@ -116,12 +116,14 @@ const AddTransactionModal = ({
                 showSearch
                 size="large"
                 onChange={async (item) => {
-                  const subCategoriesResponse = await getSubCategories(item);
+                  const subCategoriesResponse: any = await getSubCategories(
+                    item
+                  );
                   setSubCategories(subCategoriesResponse.data);
                 }}
                 style={{ textTransform: "capitalize" }}
               >
-                {categories.map((item) => (
+                {categories.map((item: any) => (
                   <Select.Option
                     key={item.id}
                     value={item.id}
@@ -150,7 +152,7 @@ const AddTransactionModal = ({
                 size="large"
                 disabled={form.getFieldValue("category") === null}
               >
-                {subCategories.map((item) => (
+                {subCategories.map((item: any) => (
                   <Select.Option key={item.id} value={item.id}>
                     {item.name}
                   </Select.Option>

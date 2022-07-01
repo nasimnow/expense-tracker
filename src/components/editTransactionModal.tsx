@@ -60,12 +60,12 @@ const EditTransactionModal = ({
   }, [visible, addCategoryModalVisible, transactionId]);
 
   const getCategoriesData = async () => {
-    const { data: categories } = await getCategories();
+    const { data: categories }: any = await getCategories();
     setCategories(categories);
   };
 
   const getTransactionData = async () => {
-    let { data } = await getSingleTransaction(transactionId);
+    let { data }: any = await getSingleTransaction(transactionId);
     data = data[0] || {};
     data = { ...data, transaction_date: moment(data.transaction_date) };
     setTransactionData(data);
@@ -73,7 +73,10 @@ const EditTransactionModal = ({
 
   const onFinish = async (values: any) => {
     setLoading(true);
-    const { error } = await updateSingleTransaction(transactionId, values);
+    const { error } = await updateSingleTransaction(
+      Number(transactionId),
+      values
+    );
     if (error) {
       message.error("Something went wrong");
     } else {
@@ -139,12 +142,14 @@ const EditTransactionModal = ({
                   showSearch
                   size="large"
                   onChange={async (item) => {
-                    const subCategoriesResponse = await getSubCategories(item);
+                    const subCategoriesResponse: any = await getSubCategories(
+                      item
+                    );
                     setSubCategories(subCategoriesResponse.data);
                   }}
                   style={{ textTransform: "capitalize" }}
                 >
-                  {categories.map((item) => (
+                  {categories.map((item: any) => (
                     <Select.Option
                       key={item.id}
                       value={item.id}
@@ -173,7 +178,7 @@ const EditTransactionModal = ({
                   size="large"
                   disabled={form.getFieldValue("category") === null}
                 >
-                  {subCategories.map((item) => (
+                  {subCategories.map((item: any) => (
                     <Select.Option key={item.id} value={item.id}>
                       {item.name}
                     </Select.Option>

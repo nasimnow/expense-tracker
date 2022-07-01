@@ -27,7 +27,7 @@ export const getTransactions = async ({
     .order("id", { ascending: false });
 };
 
-export const getSingleTransaction = async (id: number) => {
+export const getSingleTransaction = async (id: any) => {
   return await supabase
     .from("transactions")
     .select("*,categories(*),sub_categories(*)")

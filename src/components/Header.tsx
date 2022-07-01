@@ -57,13 +57,13 @@ const Header = () => {
       name: "Dashboard",
       icon: (
         <Home
-          css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#404040"
         />
       ),
       iconFilled: (
         <Home
-          css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#65a9f7"
         />
       ),
@@ -73,13 +73,13 @@ const Header = () => {
       name: "Transactions",
       icon: (
         <Card
-          css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#404040"
         />
       ),
       iconFilled: (
         <Card
-          css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#65a9f7"
         />
       ),
@@ -89,13 +89,13 @@ const Header = () => {
       name: "Categories",
       icon: (
         <FileTrayStacked
-          css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#404040"
         />
       ),
       iconFilled: (
         <FileTrayStacked
-          css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#65a9f7"
         />
       ),
