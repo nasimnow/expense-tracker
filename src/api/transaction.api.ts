@@ -39,6 +39,13 @@ export const updateSingleTransaction = async (id: number, transaction: any) => {
   return await supabase.from("transactions").update(transaction).match({ id });
 };
 
+export const deleteTransaction = async (id: number) => {
+  return await supabase
+    .from("transactions")
+    .update({ is_deleted: true })
+    .match({ id });
+};
+
 interface TransactionSumParams {
   type: "INCOME" | "EXPENSE";
   start_date: string;
@@ -50,7 +57,7 @@ export const getTransactionsSumByCategories = async ({
   start_date,
   end_date,
 }: TransactionSumParams) => {
-  return await supabase.rpc("categories_sum_date", {
+  return await supabase.rpc("categories_sum_2", {
     transaction_type: type,
     start_date: start_date,
     end_date: end_date,

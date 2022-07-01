@@ -11,10 +11,12 @@ import {
   Select,
   Button,
   Modal,
+  Popconfirm,
 } from "antd";
 import moment from "moment";
 import { DATE_FORMAT } from "../constants";
 import {
+  deleteTransaction,
   getSingleTransaction,
   updateSingleTransaction,
 } from "../api/transaction.api";
@@ -23,7 +25,7 @@ import { getCategories, getSubCategories } from "../api/category.api";
 import AddCategoryModal from "../components/addCategoryModal";
 import tw from "twin.macro";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const EditTransactions = () => {
   const transactionId: string = useLocation().pathname.split("/")[2];
@@ -77,16 +79,38 @@ const EditTransactions = () => {
     setLoading(false);
   };
 
+  const deleteTransactionAPI = async () => {
+    await deleteTransaction(Number(transactionId));
+    message.success("Transaction deleted successfully");
+    navigate("/transactions");
+  };
+
   return (
     <>
-      <Button
-        icon={<ArrowLeftOutlined />}
-        size="large"
-        style={{ marginBottom: "20px" }}
-        onClick={() => navigate("/transactions")}
-      >
-        Back
-      </Button>
+      <div tw="flex justify-between">
+        <Button
+          icon={<ArrowLeftOutlined />}
+          size="large"
+          style={{ marginBottom: "20px" }}
+          onClick={() => navigate("/transactions")}
+        >
+          Back
+        </Button>
+        <Popconfirm
+          title="Are you sure to delete this transaction"
+          onConfirm={deleteTransactionAPI}
+        >
+          <Button
+            danger
+            type="primary"
+            icon={<DeleteOutlined />}
+            size="large"
+            style={{ marginBottom: "20px" }}
+          >
+            Delete
+          </Button>
+        </Popconfirm>
+      </div>
       <AddCategoryModal
         onClose={() => {
           setAddCategoryModalVisible(false);
