@@ -1,3 +1,4 @@
+import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -9,5 +10,6 @@ export default defineConfig({
         plugins: ["babel-plugin-macros", "babel-plugin-styled-components"],
       },
     }),
+    VitePWA({ registerType: "autoUpdate" }),
   ],
 });
