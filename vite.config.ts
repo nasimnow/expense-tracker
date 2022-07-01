@@ -10,6 +10,5 @@ export default defineConfig({
         plugins: ["babel-plugin-macros", "babel-plugin-styled-components"],
       },
     }),
-    VitePWA({ registerType: "autoUpdate" }),
   ],
 });
