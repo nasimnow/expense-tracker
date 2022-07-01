@@ -3,7 +3,6 @@ import tw, { styled } from "twin.macro";
 import Header from "./components/Header";
 import Categories from "./pages/categories";
 import EditTransactions from "./pages/editTransactions";
-import Home from "./pages/Home";
 import Home2 from "./pages/Home2";
 import Transactions from "./pages/transactions";
 

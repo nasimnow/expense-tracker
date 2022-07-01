@@ -23,7 +23,7 @@ const Categories = () => {
 
   const getData = async () => {
     setLoading(true);
-    const { data } = await getCategories();
+    const { data }: any = await getCategories();
     setCategories(data);
     setLoading(false);
   };

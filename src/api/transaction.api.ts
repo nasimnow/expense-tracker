@@ -50,7 +50,7 @@ export const getTransactionsSumByCategories = async ({
   start_date,
   end_date,
 }: TransactionSumParams) => {
-  return await supabase.rpc("categories_sum_by_date", {
+  return await supabase.rpc("categories_sum_date", {
     transaction_type: type,
     start_date: start_date,
     end_date: end_date,

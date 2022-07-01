@@ -7,8 +7,8 @@ import AddTransactionDrawer from "../components/addTransactionDrawer";
 import { TransactionCard } from "../styles/transactions.style.";
 import { getTransactions } from "../api/transaction.api";
 import getPagination from "../utils/getPagination";
-import EditTransactionModal from "../components/editTransactionModal";
 import { useNavigate } from "react-router-dom";
+import { ITransaction } from "../types/transactions.types";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
 
@@ -25,11 +25,10 @@ const Transactions = () => {
 
   const [pagination, setPagination] = useState({
     current: 1,
-    pageSize: 10,
+    pageSize: 25,
     total: 0,
   });
   const navigate = useNavigate();
-  const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
     getData();
@@ -55,8 +54,8 @@ const Transactions = () => {
         ? selectedDateRange[1].format("YYYY-MM-DD")
         : moment().format("YYYY-MM-DD"),
     });
-    setPagination((old) => ({ ...old, total: count }));
-    setTransactions(data);
+    setPagination((old: any) => ({ ...old, total: count }));
+    setTransactions(data as any);
     setLoading(false);
   };
 
@@ -97,7 +96,7 @@ const Transactions = () => {
             },
             ...pagination,
           }}
-          renderItem={(item) => (
+          renderItem={(item: ITransaction) => (
             <TransactionCard
               type={item.type.toLowerCase()}
               key={item.id}

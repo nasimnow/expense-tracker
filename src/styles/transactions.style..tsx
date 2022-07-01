@@ -1,7 +1,7 @@
 import tw, { styled } from "twin.macro";
 
 interface TransactionCardProps {
-  type?: "income" | "expense";
+  type?: any;
 }
 
 export const TransactionCard = styled.div`
@@ -16,7 +16,6 @@ export const TransactionCard = styled.div`
     ${tw`flex items-center font-semibold capitalize`}
   }
   &:hover {
-    transform: scale(1.05);
     cursor: pointer;
     border: 1px solid #020202;
     border-radius: 7px;

@@ -26,10 +26,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const EditTransactions = () => {
-  const transactionId = useLocation().pathname.split("/")[2];
+  const transactionId: string = useLocation().pathname.split("/")[2];
   const [loading, setLoading] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
+
   const [subCategories, setSubCategories] = useState([]);
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
@@ -45,26 +46,29 @@ const EditTransactions = () => {
   }, [transactionId]);
 
   const getCategoriesData = async () => {
-    const { data: categories } = await getCategories();
+    const { data: categories }: any = await getCategories();
     setCategories(categories);
   };
 
   const getTransactionData = async () => {
-    let { data } = await getSingleTransaction(transactionId);
+    let { data }: any = await getSingleTransaction(Number(transactionId));
     data = data[0] || {};
     data = { ...data, transaction_date: moment(data.transaction_date) };
     getSubCategoriesById(data.category);
     setTransactionData(data);
   };
 
-  const getSubCategoriesById = async (item) => {
-    const subCategoriesResponse = await getSubCategories(item);
+  const getSubCategoriesById = async (item: any) => {
+    const subCategoriesResponse: any = await getSubCategories(item);
     setSubCategories(subCategoriesResponse.data);
   };
 
   const onFinish = async (values: any) => {
     setLoading(true);
-    const { error } = await updateSingleTransaction(transactionId, values);
+    const { error } = await updateSingleTransaction(
+      Number(transactionId),
+      values
+    );
     if (error) {
       message.error("Something went wrong");
     } else {
@@ -77,7 +81,7 @@ const EditTransactions = () => {
     <>
       <Button
         icon={<ArrowLeftOutlined />}
-        size="medium"
+        size="large"
         style={{ marginBottom: "20px" }}
         onClick={() => navigate("/transactions")}
       >
@@ -130,7 +134,7 @@ const EditTransactions = () => {
                   onChange={async (item) => await getSubCategoriesById(item)}
                   style={{ textTransform: "capitalize" }}
                 >
-                  {categories.map((item) => (
+                  {categories.map((item: any) => (
                     <Select.Option
                       key={item.id}
                       value={item.id}
@@ -159,7 +163,7 @@ const EditTransactions = () => {
                   size="large"
                   disabled={form.getFieldValue("category") === null}
                 >
-                  {subCategories.map((item) => (
+                  {subCategories.map((item: any) => (
                     <Select.Option key={item.id} value={item.id}>
                       {item.name}
                     </Select.Option>
