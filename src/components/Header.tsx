@@ -53,22 +53,6 @@ const Header = () => {
 
   const navItems = [
     {
-      path: "",
-      name: "Dashboard",
-      icon: (
-        <Home
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#404040"
-        />
-      ),
-      iconFilled: (
-        <Home
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#65a9f7"
-        />
-      ),
-    },
-    {
       path: "transactions",
       name: "Transactions",
       icon: (
@@ -79,6 +63,22 @@ const Header = () => {
       ),
       iconFilled: (
         <Card
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#65a9f7"
+        />
+      ),
+    },
+    {
+      path: "overview",
+      name: "Overview",
+      icon: (
+        <Home
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#404040"
+        />
+      ),
+      iconFilled: (
+        <Home
           // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#65a9f7"
         />

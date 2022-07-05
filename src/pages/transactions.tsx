@@ -1,4 +1,4 @@
-import { DatePicker, Button, List } from "antd";
+import { DatePicker, Button, List, Input, Select } from "antd";
 import moment from "moment";
 import { DateRanges, DATE_FORMAT } from "../constants";
 import tw from "twin.macro";
@@ -9,19 +9,21 @@ import { getTransactions } from "../api/transaction.api";
 import getPagination from "../utils/getPagination";
 import { useNavigate } from "react-router-dom";
 import { ITransaction } from "../types/transactions.types";
+import { getCategories } from "../api/category.api";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
 
 const Transactions = () => {
-  //TODO FIX EDIT MODAL ISSUE
   const [isAddDrawer, setIsAddDrawer] = useState(false);
   const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState<TDateRange>([
     null,
     null,
   ]);
-  const [transactionId, setTransactionId] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -32,13 +34,13 @@ const Transactions = () => {
 
   useEffect(() => {
     getData();
-  }, [pagination.current, selectedDateRange]);
+  }, [pagination.current, selectedDateRange, search, selectedCategory]);
 
   useEffect(() => {
-    if (!isAddDrawer && !transactionId) {
+    if (!isAddDrawer) {
       getData();
     }
-  }, [isAddDrawer, transactionId]);
+  }, [isAddDrawer]);
 
   const getData = async () => {
     setLoading(true);
@@ -53,9 +55,15 @@ const Transactions = () => {
       endDate: selectedDateRange[1]
         ? selectedDateRange[1].format("YYYY-MM-DD")
         : moment().format("YYYY-MM-DD"),
+      search,
+      categoryId: selectedCategory,
     });
     setPagination((old: any) => ({ ...old, total: count }));
     setTransactions(data as any);
+
+    const { data: categoriesData } = await getCategories();
+    setCategories(categoriesData as any);
+
     setLoading(false);
   };
 
@@ -76,7 +84,35 @@ const Transactions = () => {
           Add New Transaction
         </Button>
       </div>
-      <div tw="flex mb-6 justify-end">
+      <div tw="w-6">
+        <Select
+          showSearch
+          placeholder="Select Category"
+          style={{ width: "300px", marginBottom: "20px" }}
+          optionFilterProp="children"
+          onChange={(value: number) => setSelectedCategory(value)}
+          value={selectedCategory}
+        >
+          <Select.Option key="all" value={null}>
+            All
+          </Select.Option>
+          {categories.map((item: any) => {
+            return (
+              <Select.Option key={item.id} value={item.id}>
+                {item.name}
+              </Select.Option>
+            );
+          })}
+        </Select>
+      </div>
+      <div tw="flex mb-6 justify-between">
+        <Input.Search
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          size="large"
+          placeholder="Search.." // onSearch={onSearch}
+          style={{ width: 200 }}
+        />
         <DatePicker.RangePicker
           tw="rounded-lg "
           value={selectedDateRange}
@@ -86,6 +122,7 @@ const Transactions = () => {
           showTime
         />
       </div>
+
       <div tw="p-3 bg-white rounded-lg">
         <List
           loading={loading}
@@ -106,15 +143,18 @@ const Transactions = () => {
             >
               <div className="title-container">
                 <div className="image">
-                  {item.categories.emoji || item.categories.name.charAt(0)}
+                  {item.categories?.emoji || item.categories?.name.charAt(0)}
                 </div>
                 <div>
                   <h2>
-                    {item.categories.name}
+                    {item.categories?.name}
                     <span tw="text-gray-600 font-medium">
                       {item?.sub_categories?.name &&
-                        ` - ${item.sub_categories.name}`}
+                        ` - ${item.sub_categories?.name}`}
                     </span>
+                    <span tw="text-blue-700">{`${
+                      item.invoice_no ? " - #" + item?.invoice_no : ""
+                    }`}</span>
                   </h2>
                   <p className="date">
                     {moment(item.transaction_date).format("DD-MM-YYYY")}

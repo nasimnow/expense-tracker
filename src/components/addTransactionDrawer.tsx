@@ -81,7 +81,7 @@ const AddTransactionModal = ({
         initialValues={{
           type: "EXPENSE",
           transaction_date: moment(),
-          account: "CHEQUE",
+          account: "CASH",
         }}
       >
         <Form.Item name={["type"]} label="Type" rules={[{ required: true }]}>
@@ -112,6 +112,7 @@ const AddTransactionModal = ({
               style={{ marginBottom: "2px" }}
             >
               <Select
+                placeholder="Category"
                 optionFilterProp="children"
                 showSearch
                 size="large"
@@ -177,8 +178,8 @@ const AddTransactionModal = ({
           <Radio.Group
             size="large"
             options={[
-              { label: "Cheque", value: "CHEQUE" },
               { label: "Cash", value: "CASH" },
+              { label: "Cheque", value: "CHEQUE" },
               { label: "Bank", value: "BANK" },
             ]}
             optionType="button"
@@ -186,7 +187,9 @@ const AddTransactionModal = ({
             buttonStyle="solid"
           />
         </Form.Item>
-
+        <Form.Item name={["invoice_no"]} label="Invoice / Voucher No">
+          <Input placeholder="invoice / voucher no" />
+        </Form.Item>
         <Form.Item name={["comment"]} label="Comments">
           <Input.TextArea placeholder="Type Comments Here" />
         </Form.Item>

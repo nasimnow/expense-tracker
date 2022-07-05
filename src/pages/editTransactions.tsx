@@ -212,8 +212,8 @@ const EditTransactions = () => {
             <Radio.Group
               size="large"
               options={[
-                { label: "Cheque", value: "CHEQUE" },
                 { label: "Cash", value: "CASH" },
+                { label: "Cheque", value: "CHEQUE" },
                 { label: "Bank", value: "BANK" },
               ]}
               optionType="button"
@@ -221,7 +221,9 @@ const EditTransactions = () => {
               buttonStyle="solid"
             />
           </Form.Item>
-
+          <Form.Item name={["invoice_no"]} label="Invoice No">
+            <Input />
+          </Form.Item>
           <Form.Item name={["comment"]} label="Comments">
             <Input.TextArea placeholder="Type Comments Here" />
           </Form.Item>

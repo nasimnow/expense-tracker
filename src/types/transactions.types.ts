@@ -8,4 +8,5 @@ export interface ITransaction {
   comment: string;
   account: string;
   sub_categories: any;
+  invoice_no: number;
 }

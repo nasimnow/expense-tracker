@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import tw, { styled } from "twin.macro";
 import Header from "./components/Header";
 import Categories from "./pages/categories";
@@ -23,11 +23,10 @@ const App = () => {
       <Header />
       <MainContainer>
         <Routes>
-          <Route path="/" element={<Home2 />} />
-          {/* <Route path="/" element={<Home />} /> */}
+          <Route path="/" element={<Navigate to="/transactions" />} />
+          <Route path="/overview" element={<Home2 />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/transactions/:id" element={<EditTransactions />} />
-          <Route path="/transactions/" element={<Transactions />} />
           <Route path="/categories" element={<Categories />} />
         </Routes>
       </MainContainer>

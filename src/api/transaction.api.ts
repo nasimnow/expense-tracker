@@ -9,6 +9,8 @@ interface TransactionParams {
   to: number;
   startDate: string | null;
   endDate: string | null;
+  search: string;
+  categoryId: number | null;
 }
 
 export const getTransactions = async ({
@@ -16,15 +18,26 @@ export const getTransactions = async ({
   to,
   startDate,
   endDate,
+  search,
+  categoryId,
 }: TransactionParams) => {
-  return await supabase
+  const query = supabase
     .from("transactions")
     .select("*,categories(*),sub_categories(*)", { count: "exact" })
-    .lte("transaction_date", endDate)
-    .gte("transaction_date", startDate)
     .eq("is_deleted", false)
     .range(from, to)
     .order("id", { ascending: false });
+
+  if (categoryId) {
+    query.eq("category", categoryId);
+  }
+  if (search) {
+    query.or(`comment.ilike.%${search}%,invoice_no.ilike.%${search}%`);
+  }
+  if (startDate && endDate) {
+    query.lte("transaction_date", endDate).gte("transaction_date", startDate);
+  }
+  return await query;
 };
 
 export const getSingleTransaction = async (id: any) => {
