@@ -23,39 +23,60 @@ import {
 import { useEffect, useState } from "react";
 import { getCategories, getSubCategories } from "../api/category.api";
 import AddCategoryModal from "../components/addCategoryModal";
-import tw from "twin.macro";
+import "twin.macro";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
+import AddableSelect from "../components/AddableSelect";
+import { addTags, editTransactionTags, getTags } from "../api/tag.api";
 
 const EditTransactions = () => {
   const transactionId: string = useLocation().pathname.split("/")[2];
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<string | null>(null);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState<any>([]);
 
   const [subCategories, setSubCategories] = useState([]);
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<any>(null);
-
   const navigate = useNavigate();
 
+  const addTagAPI = async (tag: string) => {
+    setLoading("ADD_TAG");
+    const { data = [], error }: any = await addTags(tag);
+    !error && setTags([...tags, ...data]);
+    const currentTags = form.getFieldValue("tags");
+    form.setFieldsValue({ tags: [...currentTags, data[0].id] });
+
+    if (error) message.error("Same tag already exists");
+    setLoading(null);
+  };
+
   useEffect(() => {
-    setLoading(true);
+    setLoading("UPDATE_TRANSACTION");
     getCategoriesData();
+
     if (transactionId) getTransactionData();
-    setLoading(false);
+    setLoading(null);
   }, [transactionId]);
 
   const getCategoriesData = async () => {
     const { data: categories }: any = await getCategories();
+    const { data: tags }: any = await getTags();
+
+    setTags(tags);
     setCategories(categories);
   };
 
   const getTransactionData = async () => {
     let { data }: any = await getSingleTransaction(Number(transactionId));
     data = data[0] || {};
-    data = { ...data, transaction_date: moment(data.transaction_date) };
+    data = {
+      ...data,
+      transaction_date: moment(data.transaction_date),
+      tags: data.transaction_tags.map((item: any) => item.tags.id),
+    };
     getSubCategoriesById(data.category);
     setTransactionData(data);
   };
@@ -66,17 +87,21 @@ const EditTransactions = () => {
   };
 
   const onFinish = async (values: any) => {
-    setLoading(true);
+    setLoading("UPDATE_TRANSACTION");
+    const tags = values.tags;
+    delete values.tags;
     const { error } = await updateSingleTransaction(
       Number(transactionId),
       values
     );
+
     if (error) {
       message.error("Something went wrong");
     } else {
+      await editTransactionTags(Number(transactionId), tags);
       message.success("Transaction updated successfully");
     }
-    setLoading(false);
+    setLoading(null);
   };
 
   const deleteTransactionAPI = async () => {
@@ -221,6 +246,34 @@ const EditTransactions = () => {
               buttonStyle="solid"
             />
           </Form.Item>
+          <Form.Item
+            name={["tags"]}
+            label="Tags"
+            style={{ marginBottom: "2px" }}
+          >
+            <AddableSelect
+              mode="multiple"
+              placeholder="Tags"
+              optionFilterProp="children"
+              showSearch
+              size="large"
+              style={{ textTransform: "capitalize" }}
+              onAddOption={async (tag: string) => {
+                await addTagAPI(tag);
+              }}
+              addButtonLoading={loading === "ADD_TAG"}
+            >
+              {tags.map((item: any) => (
+                <Select.Option
+                  key={item.id}
+                  value={item.id}
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {item.name}
+                </Select.Option>
+              ))}
+            </AddableSelect>
+          </Form.Item>
           <Form.Item name={["invoice_no"]} label="Invoice No">
             <Input />
           </Form.Item>
@@ -231,7 +284,7 @@ const EditTransactions = () => {
             type="primary"
             htmlType="submit"
             size="large"
-            loading={loading}
+            loading={loading === "UPDATE_TRANSACTION"}
           >
             Update
           </Button>

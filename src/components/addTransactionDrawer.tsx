@@ -19,6 +19,8 @@ import { getCategories, getSubCategories } from "../api/category.api";
 import isMobile from "is-mobile";
 import AddCategoryModal from "./addCategoryModal";
 import tw from "twin.macro";
+import { addTags, addTransactionTags, getTags } from "../api/tag.api";
+import AddableSelect from "./AddableSelect";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -29,12 +31,13 @@ const AddTransactionModal = ({
   visible,
   onClose,
 }: AddTransactionModalProps) => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<string | null>(null);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
+  const [tags, setTags] = useState<any>([]);
 
   useEffect(() => {
     getData();
@@ -42,19 +45,43 @@ const AddTransactionModal = ({
 
   const getData = async () => {
     const { data: categories }: any = await getCategories();
+    const { data: tags }: any = await getTags();
+
+    setTags(tags);
     setCategories(categories);
   };
 
   const onFinish = async (values: any) => {
-    setLoading(true);
-    const { error } = await addTransactions(values);
+    setLoading("ADD_TRANSACTION");
+    //add tags
+    let tags = values.tags;
+    delete values.tags;
+    const { error, data } = await addTransactions(values);
     if (error) {
       message.error("Something went wrong");
     } else {
+      if (tags?.length > 0) {
+        tags = tags.map((tag: any) => ({
+          transaction_id: data[0].id,
+          tag_id: tag,
+        }));
+        await addTransactionTags(tags);
+      }
       message.success("Transaction added successfully");
       form.resetFields();
     }
-    setLoading(false);
+    setLoading(null);
+  };
+
+  const addTagAPI = async (tag: string) => {
+    setLoading("ADD_TAG");
+    const { data = [], error }: any = await addTags(tag);
+    !error && setTags([...tags, ...data]);
+    const currentTags = form.getFieldValue("tags");
+    form.setFieldsValue({ tags: [...currentTags, data[0].id] });
+
+    if (error) message.error("Same tag already exists");
+    setLoading(null);
   };
 
   return (
@@ -187,13 +214,42 @@ const AddTransactionModal = ({
             buttonStyle="solid"
           />
         </Form.Item>
+        <Form.Item name={["tags"]} label="Tags" style={{ marginBottom: "2px" }}>
+          <AddableSelect
+            mode="multiple"
+            placeholder="Tags"
+            optionFilterProp="children"
+            showSearch
+            size="large"
+            style={{ textTransform: "capitalize" }}
+            onAddOption={async (tag: string) => {
+              await addTagAPI(tag);
+            }}
+            addButtonLoading={loading === "ADD_TAG"}
+          >
+            {tags.map((item: any) => (
+              <Select.Option
+                key={item.id}
+                value={item.id}
+                style={{ textTransform: "capitalize" }}
+              >
+                {item.name}
+              </Select.Option>
+            ))}
+          </AddableSelect>
+        </Form.Item>
         <Form.Item name={["invoice_no"]} label="Invoice / Voucher No">
           <Input placeholder="invoice / voucher no" />
         </Form.Item>
         <Form.Item name={["comment"]} label="Comments">
           <Input.TextArea placeholder="Type Comments Here" />
         </Form.Item>
-        <Button type="primary" htmlType="submit" size="large" loading={loading}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          size="large"
+          loading={loading === "ADD_TRANSACTION"}
+        >
           Submit
         </Button>
       </Form>

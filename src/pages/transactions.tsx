@@ -1,7 +1,7 @@
-import { DatePicker, Button, List, Input, Select } from "antd";
+import { DatePicker, Button, List, Input, Select, Tag } from "antd";
 import moment from "moment";
 import { DateRanges, DATE_FORMAT } from "../constants";
-import tw from "twin.macro";
+import "twin.macro";
 import { useEffect, useState } from "react";
 import AddTransactionDrawer from "../components/addTransactionDrawer";
 import { TransactionCard } from "../styles/transactions.style.";
@@ -10,6 +10,7 @@ import getPagination from "../utils/getPagination";
 import { useNavigate } from "react-router-dom";
 import { ITransaction } from "../types/transactions.types";
 import { getCategories } from "../api/category.api";
+import getUniqueColor from "../utils/getUniqueColor";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
 
@@ -152,9 +153,14 @@ const Transactions = () => {
                       {item?.sub_categories?.name &&
                         ` - ${item.sub_categories?.name}`}
                     </span>
-                    <span tw="text-blue-700">{`${
+                    <span tw="text-blue-700 mr-1">{`${
                       item.invoice_no ? " - #" + item?.invoice_no : ""
                     }`}</span>
+                    {item.transaction_tags.map((item: any) => (
+                      <Tag color={getUniqueColor(item.tags.name)}>
+                        {item.tags.name}
+                      </Tag>
+                    ))}
                   </h2>
                   <p className="date">
                     {moment(item.transaction_date).format("DD-MM-YYYY")}
