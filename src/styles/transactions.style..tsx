@@ -17,8 +17,7 @@ export const TransactionCard = styled.div`
   }
   &:hover {
     cursor: pointer;
-    border: 1px solid #020202;
-    border-radius: 7px;
+    background-color: #d8d8d8;
   }
   .image {
     ${tw`h-7 w-7 mr-4 p-1.5  flex items-center justify-center text-xs`}

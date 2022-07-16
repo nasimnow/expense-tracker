@@ -21,6 +21,8 @@ import AddCategoryModal from "./addCategoryModal";
 import tw from "twin.macro";
 import { addTags, addTransactionTags, getTags } from "../api/tag.api";
 import AddableSelect from "./AddableSelect";
+import { addAccount, getAccounts } from "../api/account.api";
+import captalizeSentance from "../utils/capitalizeSentance";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -38,6 +40,7 @@ const AddTransactionModal = ({
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
   const [tags, setTags] = useState<any>([]);
+  const [accounts, setAccounts] = useState<any>([]);
 
   useEffect(() => {
     getData();
@@ -46,8 +49,10 @@ const AddTransactionModal = ({
   const getData = async () => {
     const { data: categories }: any = await getCategories();
     const { data: tags }: any = await getTags();
+    const { data: accounts }: any = await getAccounts();
 
     setTags(tags);
+    setAccounts(accounts);
     setCategories(categories);
   };
 
@@ -84,6 +89,20 @@ const AddTransactionModal = ({
     setLoading(null);
   };
 
+  const addAccountAPI = async (account: string) => {
+    setLoading("ADD_ACCOUNT");
+    const { data = [], error }: any = await addAccount({
+      name: captalizeSentance(account),
+    });
+    if (error) {
+      message.error("Same Account already exists");
+    } else {
+      setAccounts([...accounts, ...data]);
+      form.setFieldsValue({ account_id: data[0].id });
+    }
+    setLoading(null);
+  };
+
   return (
     <Drawer
       width={isMobile() ? "100%" : "50%"}
@@ -111,6 +130,30 @@ const AddTransactionModal = ({
           account: "CASH",
         }}
       >
+        <Form.Item name={["account_id"]} label="Account">
+          <AddableSelect
+            placeholder="Account"
+            optionFilterProp="children"
+            showSearch
+            addButtonText="Add Account"
+            size="large"
+            style={{ textTransform: "capitalize" }}
+            onAddOption={async (account: string) => {
+              await addAccountAPI(account);
+            }}
+            addButtonLoading={loading === "ADD_ACCOUNT"}
+          >
+            {accounts.map((item: any) => (
+              <Select.Option
+                key={item.id}
+                value={item.id}
+                style={{ textTransform: "capitalize" }}
+              >
+                {item.name}
+              </Select.Option>
+            ))}
+          </AddableSelect>
+        </Form.Item>
         <Form.Item name={["type"]} label="Type" rules={[{ required: true }]}>
           <Radio.Group
             size="large"

@@ -48,7 +48,7 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
   const onSubCategoryFinish = async (values: any) => {
     const { error } = await addSubCategories(values);
     if (error) {
-      message.error("Something went wrong");
+      message.error(error?.message || "Something went wrong");
     } else {
       message.success("Sub Category added successfully");
       subCategoryForm.resetFields();

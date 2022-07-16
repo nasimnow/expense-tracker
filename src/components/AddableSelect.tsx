@@ -7,6 +7,7 @@ const AddableSelect = ({
   children,
   onAddOption = () => {},
   addButtonLoading = false,
+  addButtonText = "Add ",
   ...props
 }: any) => {
   const [newOptionValue, setNewOptionValue] = useState<string>("");
@@ -35,7 +36,7 @@ const AddableSelect = ({
                 setNewOptionValue("");
               }}
             >
-              Add Tag
+              {addButtonText}
             </Button>
           </Space>
         </div>

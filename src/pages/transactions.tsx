@@ -1,15 +1,15 @@
-import { DatePicker, Button, List, Input, Select, Tag } from "antd";
+import { Button, DatePicker, Input, List, Select, Tag } from "antd";
 import moment from "moment";
-import { DateRanges, DATE_FORMAT } from "../constants";
-import "twin.macro";
 import { useEffect, useState } from "react";
-import AddTransactionDrawer from "../components/addTransactionDrawer";
-import { TransactionCard } from "../styles/transactions.style.";
-import { getTransactions } from "../api/transaction.api";
-import getPagination from "../utils/getPagination";
 import { useNavigate } from "react-router-dom";
-import { ITransaction } from "../types/transactions.types";
+import "twin.macro";
 import { getCategories } from "../api/category.api";
+import { getTransactions } from "../api/transaction.api";
+import AddTransactionDrawer from "../components/addTransactionDrawer";
+import { DateRanges, DATE_FORMAT } from "../constants";
+import { TransactionCard } from "../styles/transactions.style.";
+import { ITransaction } from "../types/transactions.types";
+import getPagination from "../utils/getPagination";
 import getUniqueColor from "../utils/getUniqueColor";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
@@ -25,12 +25,12 @@ const Transactions = () => {
   ]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 25,
     total: 0,
   });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -157,7 +157,10 @@ const Transactions = () => {
                       item.invoice_no ? " - #" + item?.invoice_no : ""
                     }`}</span>
                     {item.transaction_tags.map((item: any) => (
-                      <Tag color={getUniqueColor(item.tags.name)}>
+                      <Tag
+                        color={getUniqueColor(item.tags.name)}
+                        style={{ fontSize: "10px" }}
+                      >
                         {item.tags.name}
                       </Tag>
                     ))}

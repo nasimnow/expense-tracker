@@ -1,33 +1,33 @@
+import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
+  Button,
   Col,
   DatePicker,
-  Drawer,
   Form,
   Input,
   InputNumber,
   message,
+  Popconfirm,
   Radio,
   Row,
   Select,
-  Button,
-  Modal,
-  Popconfirm,
 } from "antd";
 import moment from "moment";
-import { DATE_FORMAT } from "../constants";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "twin.macro";
+import { addAccount, getAccounts } from "../api/account.api";
+import { getCategories, getSubCategories } from "../api/category.api";
+import { addTags, editTransactionTags, getTags } from "../api/tag.api";
 import {
   deleteTransaction,
   getSingleTransaction,
   updateSingleTransaction,
 } from "../api/transaction.api";
-import { useEffect, useState } from "react";
-import { getCategories, getSubCategories } from "../api/category.api";
-import AddCategoryModal from "../components/addCategoryModal";
-import "twin.macro";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddableSelect from "../components/AddableSelect";
-import { addTags, editTransactionTags, getTags } from "../api/tag.api";
+import AddCategoryModal from "../components/addCategoryModal";
+import { DATE_FORMAT } from "../constants";
+import captalizeSentance from "../utils/capitalizeSentance";
 
 const EditTransactions = () => {
   const transactionId: string = useLocation().pathname.split("/")[2];
@@ -35,6 +35,7 @@ const EditTransactions = () => {
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState<any>([]);
+  const [accounts, setAccounts] = useState<any>([]);
 
   const [subCategories, setSubCategories] = useState([]);
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
@@ -64,8 +65,10 @@ const EditTransactions = () => {
   const getCategoriesData = async () => {
     const { data: categories }: any = await getCategories();
     const { data: tags }: any = await getTags();
+    const { data: accounts }: any = await getAccounts();
 
     setTags(tags);
+    setAccounts(accounts);
     setCategories(categories);
   };
 
@@ -100,6 +103,7 @@ const EditTransactions = () => {
     } else {
       await editTransactionTags(Number(transactionId), tags);
       message.success("Transaction updated successfully");
+      navigate("/transactions");
     }
     setLoading(null);
   };
@@ -108,6 +112,20 @@ const EditTransactions = () => {
     await deleteTransaction(Number(transactionId));
     message.success("Transaction deleted successfully");
     navigate("/transactions");
+  };
+
+  const addAccountAPI = async (account: string) => {
+    setLoading("ADD_ACCOUNT");
+    const { data = [], error }: any = await addAccount({
+      name: captalizeSentance(account),
+    });
+    if (error) {
+      message.error("Same Account already exists");
+    } else {
+      setAccounts([...accounts, ...data]);
+      form.setFieldsValue({ account_id: data[0].id });
+    }
+    setLoading(null);
   };
 
   return (
@@ -149,6 +167,30 @@ const EditTransactions = () => {
           onFinish={onFinish}
           initialValues={transactionData}
         >
+          <Form.Item name={["account_id"]} label="Account">
+            <AddableSelect
+              placeholder="Account"
+              optionFilterProp="children"
+              showSearch
+              size="large"
+              style={{ textTransform: "capitalize" }}
+              addButtonText="Add Account"
+              onAddOption={async (account: string) => {
+                await addAccountAPI(account);
+              }}
+              addButtonLoading={loading === "ADD_ACCOUNT"}
+            >
+              {accounts.map((item: any) => (
+                <Select.Option
+                  key={item.id}
+                  value={item.id}
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {item.name}
+                </Select.Option>
+              ))}
+            </AddableSelect>
+          </Form.Item>
           <Form.Item name={["type"]} label="Type" rules={[{ required: true }]}>
             <Radio.Group
               size="large"
@@ -277,17 +319,20 @@ const EditTransactions = () => {
           <Form.Item name={["invoice_no"]} label="Invoice No">
             <Input />
           </Form.Item>
-          <Form.Item name={["comment"]} label="Comments">
+          <Form.Item name={["comment"]} label="Comments" tw="pb-20">
             <Input.TextArea placeholder="Type Comments Here" />
           </Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            loading={loading === "UPDATE_TRANSACTION"}
-          >
-            Update
-          </Button>
+          <div tw="fixed bottom-0 flex justify-end p-2 w-1/2 shadow-2xl bg-white">
+            <Button
+              type="primary"
+              tw="w-36"
+              htmlType="submit"
+              size="large"
+              loading={loading === "UPDATE_TRANSACTION"}
+            >
+              Update
+            </Button>
+          </div>
         </Form>
       ) : (
         <div>Loading...</div>
