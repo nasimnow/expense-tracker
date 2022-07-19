@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { Card, FileTrayStacked, Home, People } from "react-ionicons";
 import { useLocation, useNavigate } from "react-router-dom";
-import tw, { css, styled } from "twin.macro";
-import { Home, Card, FileTrayStacked } from "react-ionicons";
+import tw, { styled } from "twin.macro";
 
 const Header = () => {
   const [selectedPage, setSelectedPage] = useState("");
@@ -63,6 +63,22 @@ const Header = () => {
       ),
       iconFilled: (
         <Card
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#65a9f7"
+        />
+      ),
+    },
+    {
+      path: "accounts",
+      name: "Accounts",
+      icon: (
+        <People
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#404040"
+        />
+      ),
+      iconFilled: (
+        <People
           // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#65a9f7"
         />

@@ -1,7 +1,28 @@
 import supabase from "../utils/supabase";
+import { addTransactionTags } from "./tag.api";
 
 export const addTransactions = async (transaction: any) => {
-  return await supabase.from("transactions").insert(transaction);
+  try {
+    let tags = transaction.tags;
+    console.log(
+      "🚀 ~ file: transaction.api.ts ~ line 7 ~ addTransactions ~ tags",
+      tags
+    );
+    delete transaction.tags;
+    const response: any = await supabase
+      .from("transactions")
+      .insert(transaction);
+    if (tags?.length > 0) {
+      tags = tags.map((tag: any) => ({
+        transaction_id: response.data[0].id,
+        tag_id: tag,
+      }));
+      await addTransactionTags(tags);
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 interface TransactionParams {

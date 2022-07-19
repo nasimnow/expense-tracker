@@ -1,6 +1,7 @@
 import { Button, DatePicker, Input, List, Select, Tag } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import "twin.macro";
 import { getCategories } from "../api/category.api";
@@ -11,40 +12,28 @@ import { TransactionCard } from "../styles/transactions.style.";
 import { ITransaction } from "../types/transactions.types";
 import getPagination from "../utils/getPagination";
 import getUniqueColor from "../utils/getUniqueColor";
+import useZustandStore from "../stores/useZustandStore";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
 
 const Transactions = () => {
-  const [isAddDrawer, setIsAddDrawer] = useState(false);
-  const [transactions, setTransactions] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState<TDateRange>([
     null,
     null,
   ]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 25,
-    total: 0,
-  });
 
-  const navigate = useNavigate();
+  const pagination = useZustandStore((state) => state.pagination);
+  const setPagination = useZustandStore((state) => state.setPagination);
 
-  useEffect(() => {
-    getData();
-  }, [pagination.current, selectedDateRange, search, selectedCategory]);
+  const isAddDrawer = useZustandStore((state) => state.isAddDrawer);
+  const setIsAddDrawer = useZustandStore((state) => state.setIsAddDrawer);
 
-  useEffect(() => {
-    if (!isAddDrawer) {
-      getData();
-    }
-  }, [isAddDrawer]);
+  const scrollPosition = useZustandStore((state) => state.scrollPosition);
+  const setScrollPosition = useZustandStore((state) => state.setScrollPosition);
 
   const getData = async () => {
-    setLoading(true);
     const { from, to } = getPagination(pagination.current, pagination.pageSize);
     //if range is null set a default date
     const { data, error, count } = await getTransactions({
@@ -59,14 +48,34 @@ const Transactions = () => {
       search,
       categoryId: selectedCategory,
     });
-    setPagination((old: any) => ({ ...old, total: count }));
-    setTransactions(data as any);
-
-    const { data: categoriesData } = await getCategories();
-    setCategories(categoriesData as any);
-
-    setLoading(false);
+    setPagination({ total: count });
+    return data;
   };
+
+  const transactionQuery = useQuery(["transactions"], getData);
+  const categoriesQuery = useQuery(["categories"], getCategories);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    transactionQuery.refetch();
+  }, [pagination.current, selectedDateRange, search, selectedCategory]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pagination.current]);
+
+  useEffect(() => {
+    if (!isAddDrawer) {
+      transactionQuery.refetch();
+    }
+  }, [isAddDrawer]);
+
+  useEffect(() => {
+    if (scrollPosition) {
+      window.scrollTo(0, scrollPosition);
+    }
+  }, [scrollPosition]);
 
   return (
     <>
@@ -87,6 +96,7 @@ const Transactions = () => {
       </div>
       <div tw="w-6">
         <Select
+          loading={categoriesQuery.isLoading}
           showSearch
           placeholder="Select Category"
           style={{ width: "300px", marginBottom: "20px" }}
@@ -97,13 +107,14 @@ const Transactions = () => {
           <Select.Option key="all" value={null}>
             All
           </Select.Option>
-          {categories.map((item: any) => {
-            return (
-              <Select.Option key={item.id} value={item.id}>
-                {item.name}
-              </Select.Option>
-            );
-          })}
+          {categoriesQuery.isSuccess &&
+            categoriesQuery?.data.data.map((item: any) => {
+              return (
+                <Select.Option key={item.id} value={item.id}>
+                  {item.name}
+                </Select.Option>
+              );
+            })}
         </Select>
       </div>
       <div tw="flex mb-6 justify-between">
@@ -126,11 +137,11 @@ const Transactions = () => {
 
       <div tw="p-3 bg-white rounded-lg">
         <List
-          loading={loading}
-          dataSource={transactions}
+          loading={transactionQuery.isFetching}
+          dataSource={transactionQuery.data}
           pagination={{
             onChange: (page) => {
-              setPagination((old) => ({ ...old, current: page }));
+              setPagination({ current: page });
             },
             ...pagination,
           }}
@@ -139,6 +150,7 @@ const Transactions = () => {
               type={item.type.toLowerCase()}
               key={item.id}
               onClick={() => {
+                setScrollPosition(window.scrollY);
                 navigate(`/transactions/${item.id}`);
               }}
             >

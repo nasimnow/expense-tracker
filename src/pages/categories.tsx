@@ -1,4 +1,4 @@
-import tw from "twin.macro";
+import "twin.macro";
 import { useEffect, useState } from "react";
 import AddCategoryModal from "../components/addCategoryModal";
 import { deleteCategory, getCategories } from "../api/category.api";

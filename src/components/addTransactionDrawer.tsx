@@ -1,4 +1,5 @@
 import {
+  Button,
   Col,
   DatePicker,
   Drawer,
@@ -9,20 +10,20 @@ import {
   Radio,
   Row,
   Select,
-  Button,
 } from "antd";
-import moment from "moment";
-import { DATE_FORMAT } from "../constants";
-import { addTransactions } from "../api/transaction.api";
-import { useEffect, useState } from "react";
-import { getCategories, getSubCategories } from "../api/category.api";
 import isMobile from "is-mobile";
-import AddCategoryModal from "./addCategoryModal";
-import tw from "twin.macro";
-import { addTags, addTransactionTags, getTags } from "../api/tag.api";
-import AddableSelect from "./AddableSelect";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { addAccount, getAccounts } from "../api/account.api";
+import { getCategories, getSubCategories } from "../api/category.api";
+import { addTags, getTags } from "../api/tag.api";
+import { addTransactions } from "../api/transaction.api";
+import { DATE_FORMAT } from "../constants";
 import captalizeSentance from "../utils/capitalizeSentance";
+import AddableSelect from "./AddableSelect";
+import AddCategoryModal from "./addCategoryModal";
+import "twin.macro";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -42,6 +43,8 @@ const AddTransactionModal = ({
   const [tags, setTags] = useState<any>([]);
   const [accounts, setAccounts] = useState<any>([]);
 
+  const transactionsQuery = useMutation(addTransactions);
+
   useEffect(() => {
     getData();
   }, [visible, addCategoryModalVisible]);
@@ -57,25 +60,12 @@ const AddTransactionModal = ({
   };
 
   const onFinish = async (values: any) => {
-    setLoading("ADD_TRANSACTION");
-    //add tags
-    let tags = values.tags;
-    delete values.tags;
-    const { error, data } = await addTransactions(values);
-    if (error) {
-      message.error("Something went wrong");
-    } else {
-      if (tags?.length > 0) {
-        tags = tags.map((tag: any) => ({
-          transaction_id: data[0].id,
-          tag_id: tag,
-        }));
-        await addTransactionTags(tags);
-      }
+    transactionsQuery.mutate(values);
+    if (transactionsQuery.isError) message.error("Something went wrong");
+    else {
       message.success("Transaction added successfully");
       form.resetFields();
     }
-    setLoading(null);
   };
 
   const addTagAPI = async (tag: string) => {
@@ -84,7 +74,6 @@ const AddTransactionModal = ({
     !error && setTags([...tags, ...data]);
     const currentTags = form.getFieldValue("tags");
     form.setFieldsValue({ tags: [...currentTags, data[0].id] });
-
     if (error) message.error("Same tag already exists");
     setLoading(null);
   };
@@ -130,10 +119,46 @@ const AddTransactionModal = ({
           account: "CASH",
         }}
       >
+        <Row>
+          <Col xs={24} sm={24} lg={12}>
+            <Form.Item
+              name={["type"]}
+              label="Type"
+              rules={[{ required: true }]}
+            >
+              <Radio.Group
+                size="large"
+                options={[
+                  { label: "Expense", value: "EXPENSE" },
+                  { label: "Income", value: "INCOME" },
+                ]}
+                optionType="button"
+                value={["CASH"]}
+                buttonStyle="solid"
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} lg={12}>
+            <Form.Item
+              name={["transaction_date"]}
+              label="Date"
+              rules={[{ required: true }]}
+            >
+              <DatePicker size="large" format={DATE_FORMAT} />
+            </Form.Item>
+          </Col>
+        </Row>
+
         <Form.Item name={["account_id"]} label="Account">
           <AddableSelect
             placeholder="Account"
             optionFilterProp="children"
+            filterOption={(input: any, option: any) =>
+              option.children
+                .replace(/ /g, "")
+                .toLowerCase()
+                .indexOf(input.replace(/ /g, "").toLowerCase()) >= 0
+            }
             showSearch
             addButtonText="Add Account"
             size="large"
@@ -153,25 +178,6 @@ const AddTransactionModal = ({
               </Select.Option>
             ))}
           </AddableSelect>
-        </Form.Item>
-        <Form.Item name={["type"]} label="Type" rules={[{ required: true }]}>
-          <Radio.Group
-            size="large"
-            options={[
-              { label: "Expense", value: "EXPENSE" },
-              { label: "Income", value: "INCOME" },
-            ]}
-            optionType="button"
-            value={["CASH"]}
-            buttonStyle="solid"
-          />
-        </Form.Item>
-        <Form.Item
-          name={["transaction_date"]}
-          label="Date"
-          rules={[{ required: true }]}
-        >
-          <DatePicker size="large" format={DATE_FORMAT} />
         </Form.Item>
         <Row gutter={{ sm: 8, lg: 24 }}>
           <Col xs={24} sm={24} lg={12}>
@@ -206,7 +212,7 @@ const AddTransactionModal = ({
               </Select>
             </Form.Item>
             <p
-              tw="text-blue-600 font-bold cursor-pointer"
+              tw="text-blue-600 font-bold cursor-pointer pb-2"
               onClick={() => {
                 form.setFieldsValue({ category: null });
                 setAddCategoryModalVisible(true);
@@ -232,31 +238,42 @@ const AddTransactionModal = ({
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item
-          style={{ marginTop: "6px" }}
-          name={["amount"]}
-          label="Amount"
-          rules={[{ required: true }]}
-        >
-          <InputNumber size="large" placeholder="Amount" />
-        </Form.Item>
-        <Form.Item
-          name={["account"]}
-          label="Account"
-          rules={[{ required: true }]}
-        >
-          <Radio.Group
-            size="large"
-            options={[
-              { label: "Cash", value: "CASH" },
-              { label: "Cheque", value: "CHEQUE" },
-              { label: "Bank", value: "BANK" },
-            ]}
-            optionType="button"
-            value={["CASH"]}
-            buttonStyle="solid"
-          />
-        </Form.Item>
+        <Row>
+          <Col xs={24} sm={24} lg={14}>
+            <Form.Item
+              name={["account"]}
+              label="Account"
+              rules={[{ required: true }]}
+            >
+              <Radio.Group
+                size="large"
+                options={[
+                  { label: "Cash", value: "CASH" },
+                  { label: "Cheque", value: "CHEQUE" },
+                  { label: "Bank", value: "BANK" },
+                ]}
+                optionType="button"
+                value={["CASH"]}
+                buttonStyle="solid"
+              />
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} sm={24} lg={10}>
+            <Form.Item
+              name={["amount"]}
+              label="Amount"
+              rules={[{ required: true }]}
+            >
+              <InputNumber
+                size="large"
+                placeholder="Amount"
+                style={{ width: "150px" }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
         <Form.Item name={["tags"]} label="Tags" style={{ marginBottom: "2px" }}>
           <AddableSelect
             mode="multiple"
@@ -291,7 +308,7 @@ const AddTransactionModal = ({
           type="primary"
           htmlType="submit"
           size="large"
-          loading={loading === "ADD_TRANSACTION"}
+          loading={transactionsQuery.isLoading}
         >
           Submit
         </Button>

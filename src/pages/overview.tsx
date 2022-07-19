@@ -76,7 +76,7 @@ const Home2 = () => {
           <h2>Balance</h2>
         </div>
         <div tw="flex flex-col">
-          <div className="money">{totalIncome}</div>
+          <div className="money">{totalIncome.toFixed(2)}</div>
         </div>
       </TransactionCard>
 
