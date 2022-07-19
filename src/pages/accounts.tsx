@@ -6,8 +6,10 @@ import { AccountsCard } from "../styles/accounts.style";
 import "twin.macro";
 import useZustandStore from "../stores/useZustandStore";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Accounts = () => {
+  const navigate = useNavigate();
   const accountSearch = useZustandStore((state) => state.accountSearch);
   const setAccountSearch = useZustandStore((state) => state.setAccountSearch);
   const accountsQuery = useQuery<any>(["accounts"], () =>
@@ -32,7 +34,10 @@ const Accounts = () => {
         loading={accountsQuery.isLoading}
         dataSource={accountsQuery.data?.data}
         renderItem={(item: any) => (
-          <AccountsCard key={item.id}>
+          <AccountsCard
+            key={item.id}
+            onClick={() => navigate(`/accounts/${item.id}`)}
+          >
             <div className="title">
               <div className="image">{item.emoji || item.name.charAt(0)}</div>
               <h2>{item.name}</h2>

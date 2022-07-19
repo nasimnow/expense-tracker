@@ -32,6 +32,7 @@ interface TransactionParams {
   endDate: string | null;
   search: string;
   categoryId: number | null;
+  accountId?: number | null;
 }
 
 export const getTransactions = async ({
@@ -41,6 +42,7 @@ export const getTransactions = async ({
   endDate,
   search,
   categoryId,
+  accountId,
 }: TransactionParams) => {
   const query = supabase
     .from("transactions")
@@ -59,6 +61,9 @@ export const getTransactions = async ({
   }
   if (startDate && endDate) {
     query.lte("transaction_date", endDate).gte("transaction_date", startDate);
+  }
+  if (accountId) {
+    query.eq("account_id", accountId);
   }
   return await query;
 };

@@ -5,7 +5,7 @@ export const addAccount = async (account: any) => {
 };
 
 export const getAccounts = async (search = "" as any) => {
-  const query = supabase.from("accounts").select("name").order("id", {
+  const query = supabase.from("accounts").select("*").order("id", {
     ascending: false,
   });
   if (search) {

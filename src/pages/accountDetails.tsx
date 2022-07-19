@@ -1,22 +1,24 @@
-import { Button, DatePicker, Input, List, Select, Tag } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { DatePicker, Input, List, Select, Tag } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "twin.macro";
 import { getCategories } from "../api/category.api";
 import { getTransactions } from "../api/transaction.api";
 import AddTransactionDrawer from "../components/addTransactionDrawer";
 import { DateRanges, DATE_FORMAT } from "../constants";
+import useZustandStore from "../stores/useZustandStore";
 import { TransactionCard } from "../styles/transactions.style.";
 import { ITransaction } from "../types/transactions.types";
 import getPagination from "../utils/getPagination";
 import getUniqueColor from "../utils/getUniqueColor";
-import useZustandStore from "../stores/useZustandStore";
 
 type TDateRange = [moment.Moment | null, moment.Moment | null];
 
-const Transactions = () => {
+const AccountDetails = () => {
+  const { id: accountId } = useParams();
+
   const [selectedDateRange, setSelectedDateRange] = useState<TDateRange>([
     null,
     null,
@@ -47,6 +49,7 @@ const Transactions = () => {
         : moment().format("YYYY-MM-DD"),
       search,
       categoryId: selectedCategory,
+      accountId: Number(accountId),
     });
     setPagination({ total: count });
     return data;
@@ -85,15 +88,9 @@ const Transactions = () => {
       />
 
       <div tw="flex justify-between items-center mb-6">
-        <h2 tw="font-medium text-base mb-6"> Transactions</h2>
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => setIsAddDrawer(true)}
-        >
-          Add New Transaction
-        </Button>
+        <h2 tw="font-medium text-base"> Account Details</h2>
       </div>
+      <h2 tw="font-medium text-2xl mb-6">Abdulla Al Khoori</h2>
       <div tw="w-6">
         <Select
           loading={categoriesQuery.isLoading}
@@ -201,4 +198,4 @@ const Transactions = () => {
     </>
   );
 };
-export default Transactions;
+export default AccountDetails;

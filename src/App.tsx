@@ -7,7 +7,8 @@ import {
   useLocation,
 } from "react-router-dom";
 import tw, { styled } from "twin.macro";
-import Header from "./components/Header";
+import Header from "./components/Sidebar";
+import AccountDetails from "./pages/accountDetails";
 import Accounts from "./pages/accounts";
 import Categories from "./pages/categories";
 import EditTransactions from "./pages/editTransactions";
@@ -48,6 +49,7 @@ const App = () => {
           <Route path="/transactions/:id" element={<EditTransactions />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/accounts/:id" element={<AccountDetails />} />
         </Routes>
       </MainContainer>
     </BrowserRouter>
