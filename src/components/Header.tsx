@@ -69,22 +69,6 @@ const Header = () => {
       ),
     },
     {
-      path: "accounts",
-      name: "Accounts",
-      icon: (
-        <People
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#404040"
-        />
-      ),
-      iconFilled: (
-        <People
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#65a9f7"
-        />
-      ),
-    },
-    {
       path: "overview",
       name: "Overview",
       icon: (
@@ -100,6 +84,23 @@ const Header = () => {
         />
       ),
     },
+    {
+      path: "accounts",
+      name: "Accounts",
+      icon: (
+        <People
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#404040"
+        />
+      ),
+      iconFilled: (
+        <People
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#65a9f7"
+        />
+      ),
+    },
+
     {
       path: "categories",
       name: "Categories",
