@@ -26,13 +26,15 @@ export const addTransactions = async (transaction: any) => {
 };
 
 interface TransactionParams {
-  from: number;
-  to: number;
-  startDate: string | null;
-  endDate: string | null;
-  search: string;
-  categoryId: number | null;
-  accountId?: number | null;
+  from?: number;
+  to?: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  search?: string;
+  category_ids?: number[] | undefined;
+  account_ids: number[] | undefined;
+  tag_ids?: number[] | undefined;
+  transaction_type?: "expense" | "income" | null | undefined;
 }
 
 export const getTransactions = async ({
@@ -41,8 +43,10 @@ export const getTransactions = async ({
   startDate,
   endDate,
   search,
-  categoryId,
-  accountId,
+  category_ids,
+  account_ids,
+  tag_ids,
+  transaction_type,
 }: TransactionParams) => {
   const query = supabase
     .from("transactions")
@@ -53,21 +57,44 @@ export const getTransactions = async ({
       }
     )
     .eq("is_deleted", false)
-    .range(from, to)
     .order("id", { ascending: false });
 
-  if (categoryId) {
-    query.eq("category", categoryId);
+  if (transaction_type) {
+    query.eq("type", transaction_type.toUpperCase());
+  }
+
+  if (from && to) {
+    query.range(from, to);
+  }
+  if (category_ids && category_ids.length > 0) {
+    query.in("category", category_ids);
   }
   if (search) {
     query.or(`comment.ilike.%${search}%,invoice_no.ilike.%${search}%`);
+    query.or(`name.ilike.%${search}%`, { foreignTable: "accounts" });
   }
   if (startDate && endDate) {
     query.lte("transaction_date", endDate).gte("transaction_date", startDate);
   }
-  if (accountId) {
-    query.eq("account_id", accountId);
+  if (account_ids && account_ids.length > 0) {
+    query.in("account_id", account_ids);
   }
+  if (tag_ids && tag_ids.length > 0) {
+    let { data: taggedTransactions = [] } = await supabase
+      .from("transaction_tags")
+      .select("transaction_id")
+      .in("tag_id", tag_ids);
+
+    console.log(taggedTransactions);
+
+    if (taggedTransactions && taggedTransactions.length > 0) {
+      taggedTransactions = taggedTransactions.map(
+        (account: any) => account.transaction_id
+      );
+      query.in("id", taggedTransactions);
+    }
+  }
+
   return await query;
 };
 

@@ -6,6 +6,25 @@ interface IPagination {
   total: number;
 }
 
+type TDateRange = [moment.Moment | null, moment.Moment | null];
+interface ITransactionFilters {
+  filter_accounts?: number[];
+  filter_categories?: number[];
+  filter_sub_categories?: number[];
+  filter_tags?: number[];
+  filter_type?: null | "income" | "expense";
+  filter_date_range?: TDateRange;
+}
+
+export const defaultFilterValues: ITransactionFilters = {
+  filter_accounts: [],
+  filter_categories: [],
+  filter_sub_categories: [],
+  filter_tags: [],
+  filter_type: null,
+  filter_date_range: [null, null],
+};
+
 interface IState {
   scrollPosition: number;
   setScrollPosition: (scrollPosition: number) => void;
@@ -13,10 +32,11 @@ interface IState {
   setIsAddDrawer: (isAddDrawer: boolean) => void;
   pagination: IPagination;
   setPagination: (pagination: any) => void;
-
   //accounts
   accountSearch: string;
   setAccountSearch: (accountSearch: string) => void;
+  transactionFilters: ITransactionFilters;
+  setTransactionFilters: (transactionFilters: ITransactionFilters) => void;
 }
 
 const useZustandStore = create<IState>((set) => ({
@@ -39,6 +59,12 @@ const useZustandStore = create<IState>((set) => ({
   //accounts
   accountSearch: "",
   setAccountSearch: (accountSearch) => set({ accountSearch }),
+
+  transactionFilters: { ...defaultFilterValues },
+  setTransactionFilters: (transactionFilters) =>
+    set((old) => ({
+      transactionFilters: { ...old.transactionFilters, ...transactionFilters },
+    })),
 }));
 
 export default useZustandStore;

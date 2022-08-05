@@ -49,8 +49,8 @@ const AccountDetails = () => {
         ? selectedDateRange[1].format("YYYY-MM-DD")
         : moment().format("YYYY-MM-DD"),
       search,
-      categoryId: selectedCategory,
-      accountId: Number(accountId),
+      category_ids: selectedCategory ? [selectedCategory] : [],
+      account_ids: accountId ? [Number(accountId)] : [],
     });
     setPagination({ total: count });
     return data;
