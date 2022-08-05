@@ -1,12 +1,15 @@
+import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { Card, FileTrayStacked, Home, People } from "react-ionicons";
 import { useLocation, useNavigate } from "react-router-dom";
 import tw, { styled } from "twin.macro";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 const Header = () => {
   const [selectedPage, setSelectedPage] = useState("");
   const pathname = useLocation().pathname.split("/")[1];
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useLocalStorage("isLoggedIn", true);
 
   interface NavItemProps {
     selected: boolean;
@@ -138,7 +141,19 @@ const Header = () => {
             </NavItem>
           ))}
         </div>
+        <Button
+          tw="mt-10"
+          size="large"
+          danger
+          onClick={() => {
+            setIsLoggedIn(false);
+            location.reload();
+          }}
+        >
+          Logout
+        </Button>
       </NavContainer>
+
       <MobileNav>
         {navItems.map((item) => (
           <div

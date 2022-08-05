@@ -14,6 +14,9 @@ import Categories from "./pages/categories";
 import EditTransactions from "./pages/editTransactions";
 import Home2 from "./pages/overview";
 import Transactions from "./pages/transactions";
+import useLocalStorage from "./hooks/useLocalStorage";
+import { Modal } from "antd";
+import LoginComponent from "./components/LoginComponent";
 
 const MainContainer = styled.div`
   @media (min-width: 768px) {
@@ -37,10 +40,15 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useLocalStorage("isLoggedIn", false);
+
   return (
     <BrowserRouter>
       <ScrollToTop />
       <Header />
+      <Modal closable={false} visible={!isLoggedIn} footer={null} centered>
+        <LoginComponent setIsLoggedIn={setIsLoggedIn} />
+      </Modal>
       <MainContainer>
         <Routes>
           <Route path="/" element={<Navigate to="/transactions" />} />

@@ -68,6 +68,12 @@ display: none !important;
 .ant-form-item{
   margin-bottom: 10px !important;
 }
+
+.ant-modal-mask{
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+
 /*
   ANTD STYLES END
 */
