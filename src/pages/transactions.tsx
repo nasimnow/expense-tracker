@@ -32,7 +32,6 @@ const getFiltersData = async () => {
 };
 
 const Transactions = () => {
-  const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   const pagination = useZustandStore((state) => state.pagination);
@@ -51,6 +50,7 @@ const Transactions = () => {
     filter_tags,
     filter_type,
     filter_date_range,
+    filter_search,
   } = transactionFilters;
 
   const isAddDrawer = useZustandStore((state) => state.isAddDrawer);
@@ -73,7 +73,7 @@ const Transactions = () => {
         filter_date_range && filter_date_range[1]
           ? filter_date_range[1].format("YYYY-MM-DD")
           : moment().format("YYYY-MM-DD"),
-      search,
+      search: filter_search,
       category_ids: filter_categories,
       account_ids: filter_accounts,
       tag_ids: filter_tags,
@@ -93,7 +93,7 @@ const Transactions = () => {
 
   useEffect(() => {
     transactionQuery.refetch();
-  }, [pagination.current, transactionFilters, search, selectedCategory]);
+  }, [pagination.current, transactionFilters, filter_search, selectedCategory]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -146,10 +146,12 @@ const Transactions = () => {
 
       <div tw="flex mb-2 justify-between">
         <Input.Search
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={filter_search}
+          onChange={(e) =>
+            setTransactionFilters({ filter_search: e.target.value })
+          }
           size="large"
-          placeholder="Search.."
+          placeholder="Search comments,invoice"
           style={{ width: 400 }}
         />
         <DatePicker.RangePicker

@@ -71,7 +71,6 @@ export const getTransactions = async ({
   }
   if (search) {
     query.or(`comment.ilike.%${search}%,invoice_no.ilike.%${search}%`);
-    query.or(`name.ilike.%${search}%`, { foreignTable: "accounts" });
   }
   if (startDate && endDate) {
     query.lte("transaction_date", endDate).gte("transaction_date", startDate);
@@ -84,8 +83,6 @@ export const getTransactions = async ({
       .from("transaction_tags")
       .select("transaction_id")
       .in("tag_id", tag_ids);
-
-    console.log(taggedTransactions);
 
     if (taggedTransactions && taggedTransactions.length > 0) {
       taggedTransactions = taggedTransactions.map(
