@@ -160,6 +160,9 @@ const Transactions = () => {
                 </div>
                 <div>
                   <h2>
+                    <span tw="font-bold">
+                      {item.accounts?.name && `${item.accounts?.name} - `}
+                    </span>
                     {item.categories?.name}
                     <span tw="text-gray-600 font-medium">
                       {item?.sub_categories?.name &&

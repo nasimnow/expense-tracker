@@ -16,6 +16,10 @@
 html, body {
   height: 100%;
 }
+.anticon svg {
+  vertical-align: baseline;
+}
+
 /*
   Typographic tweaks!
   4. Add accessible line-height

@@ -85,11 +85,19 @@ const EditTransactions = () => {
   };
 
   const getSubCategoriesById = async (item: any) => {
-    const subCategoriesResponse: any = await getSubCategories(item);
-    setSubCategories(subCategoriesResponse.data);
+    if (item) {
+      const subCategoriesResponse: any = await getSubCategories(item);
+      setSubCategories(subCategoriesResponse.data);
+    }
   };
 
   const onFinish = async (values: any) => {
+    // replace undefined with null
+    Object.keys(values).forEach((key) => {
+      if (values[key] === undefined) {
+        values[key] = null;
+      }
+    });
     setLoading("UPDATE_TRANSACTION");
     const tags = values.tags;
     delete values.tags;
@@ -179,6 +187,7 @@ const EditTransactions = () => {
                 await addAccountAPI(account);
               }}
               addButtonLoading={loading === "ADD_ACCOUNT"}
+              allowClear
             >
               {accounts.map((item: any) => (
                 <Select.Option
@@ -224,6 +233,8 @@ const EditTransactions = () => {
                   size="large"
                   onChange={async (item) => await getSubCategoriesById(item)}
                   style={{ textTransform: "capitalize" }}
+                  allowClear
+                  onClear={() => form.setFieldsValue({ sub_category: null })}
                 >
                   {categories.map((item: any) => (
                     <Select.Option
@@ -253,6 +264,7 @@ const EditTransactions = () => {
                   showSearch
                   size="large"
                   disabled={form.getFieldValue("category") === null}
+                  allowClear
                 >
                   {subCategories.map((item: any) => (
                     <Select.Option key={item.id} value={item.id}>

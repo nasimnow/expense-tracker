@@ -4,6 +4,7 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "twin.macro";
+import { getSingleAccount } from "../api/account.api";
 import { getCategories } from "../api/category.api";
 import { getTransactions } from "../api/transaction.api";
 import AddTransactionDrawer from "../components/addTransactionDrawer";
@@ -57,6 +58,9 @@ const AccountDetails = () => {
 
   const transactionQuery = useQuery<any>(["transactions"], getData);
   const categoriesQuery = useQuery<any>(["categories"], getCategories);
+  const accountQuery = useQuery<any>(["accounts", accountId], () =>
+    getSingleAccount(Number(accountId))
+  );
 
   const navigate = useNavigate();
 
@@ -90,7 +94,9 @@ const AccountDetails = () => {
       <div tw="flex justify-between items-center mb-6">
         <h2 tw="font-medium text-base"> Account Details</h2>
       </div>
-      <h2 tw="font-medium text-2xl mb-6">Abdulla Al Khoori</h2>
+      <h2 tw="font-medium text-2xl mb-6">
+        {accountQuery.isSuccess && accountQuery.data.data[0].name}
+      </h2>
       <div tw="w-6">
         <Select
           loading={categoriesQuery.isLoading}

@@ -46,9 +46,12 @@ export const getTransactions = async ({
 }: TransactionParams) => {
   const query = supabase
     .from("transactions")
-    .select("*,categories(*),sub_categories(*),transaction_tags(tags(*))", {
-      count: "exact",
-    })
+    .select(
+      "*,categories(*),sub_categories(*),transaction_tags(tags(*)),accounts(*)",
+      {
+        count: "exact",
+      }
+    )
     .eq("is_deleted", false)
     .range(from, to)
     .order("id", { ascending: false });

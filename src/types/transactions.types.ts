@@ -10,4 +10,5 @@ export interface ITransaction {
   sub_categories: any;
   invoice_no: number;
   transaction_tags: any;
+  accounts: any;
 }

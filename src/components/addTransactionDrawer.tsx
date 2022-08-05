@@ -1,6 +1,7 @@
 import {
   Button,
   Col,
+  Collapse,
   DatePicker,
   Drawer,
   Form,
@@ -239,7 +240,7 @@ const AddTransactionModal = ({
           </Col>
         </Row>
         <Row>
-          <Col xs={24} sm={24} lg={14}>
+          <Col xs={24} sm={24} lg={13}>
             <Form.Item
               name={["account"]}
               label="Account"
@@ -259,51 +260,54 @@ const AddTransactionModal = ({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={24} lg={10}>
+          <Col xs={24} sm={24} lg={11}>
             <Form.Item
               name={["amount"]}
               label="Amount"
               rules={[{ required: true }]}
             >
-              <InputNumber
-                size="large"
-                placeholder="Amount"
-                style={{ width: "150px" }}
-              />
+              <InputNumber tw="w-full" size="large" placeholder="Amount" />
             </Form.Item>
           </Col>
         </Row>
-
-        <Form.Item name={["tags"]} label="Tags" style={{ marginBottom: "2px" }}>
-          <AddableSelect
-            mode="multiple"
-            placeholder="Tags"
-            optionFilterProp="children"
-            showSearch
-            size="large"
-            style={{ textTransform: "capitalize" }}
-            onAddOption={async (tag: string) => {
-              await addTagAPI(tag);
-            }}
-            addButtonLoading={loading === "ADD_TAG"}
-          >
-            {tags.map((item: any) => (
-              <Select.Option
-                key={item.id}
-                value={item.id}
+        <Collapse tw="mb-4 mt-2">
+          <Collapse.Panel header="More Options" key="1">
+            <Form.Item
+              name={["tags"]}
+              label="Tags"
+              style={{ marginBottom: "2px" }}
+            >
+              <AddableSelect
+                mode="multiple"
+                placeholder="Tags"
+                optionFilterProp="children"
+                showSearch
+                size="large"
                 style={{ textTransform: "capitalize" }}
+                onAddOption={async (tag: string) => {
+                  await addTagAPI(tag);
+                }}
+                addButtonLoading={loading === "ADD_TAG"}
               >
-                {item.name}
-              </Select.Option>
-            ))}
-          </AddableSelect>
-        </Form.Item>
-        <Form.Item name={["invoice_no"]} label="Invoice / Voucher No">
-          <Input placeholder="invoice / voucher no" />
-        </Form.Item>
-        <Form.Item name={["comment"]} label="Comments">
-          <Input.TextArea placeholder="Type Comments Here" />
-        </Form.Item>
+                {tags.map((item: any) => (
+                  <Select.Option
+                    key={item.id}
+                    value={item.id}
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {item.name}
+                  </Select.Option>
+                ))}
+              </AddableSelect>
+            </Form.Item>
+            <Form.Item name={["invoice_no"]} label="Invoice / Voucher No">
+              <Input placeholder="invoice / voucher no" />
+            </Form.Item>
+            <Form.Item name={["comment"]} label="Comments">
+              <Input.TextArea placeholder="Type Comments Here" />
+            </Form.Item>
+          </Collapse.Panel>
+        </Collapse>
         <Button
           type="primary"
           htmlType="submit"
