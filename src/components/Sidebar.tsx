@@ -1,3 +1,4 @@
+import { PictureFilled, PictureOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { Card, FileTrayStacked, Home, People } from "react-ionicons";
@@ -115,6 +116,22 @@ const Header = () => {
       ),
       iconFilled: (
         <FileTrayStacked
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#65a9f7"
+        />
+      ),
+    },
+    {
+      path: "login_photos",
+      name: "Login Photos",
+      icon: (
+        <PictureOutlined
+          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+          color="#404040"
+        />
+      ),
+      iconFilled: (
+        <PictureFilled
           // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
           color="#65a9f7"
         />

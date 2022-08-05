@@ -17,6 +17,7 @@ import Transactions from "./pages/transactions";
 import useLocalStorage from "./hooks/useLocalStorage";
 import { Modal } from "antd";
 import LoginComponent from "./components/LoginComponent";
+import LoginPhotos from "./pages/LoginPhotos";
 
 const MainContainer = styled.div`
   @media (min-width: 768px) {
@@ -58,6 +59,8 @@ const App = () => {
           <Route path="/categories" element={<Categories />} />
           <Route path="/accounts" element={<Accounts />} />
           <Route path="/accounts/:id" element={<AccountDetails />} />
+
+          <Route path="/login_photos" element={<LoginPhotos />} />
         </Routes>
       </MainContainer>
     </BrowserRouter>
