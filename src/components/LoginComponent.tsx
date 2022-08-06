@@ -14,79 +14,78 @@ const LoginComponent = ({ setIsLoggedIn }: any) => {
   let photoRef = useRef(null);
   let videoRef = useRef(null);
 
-  const getVideo = () => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-      })
-      .then((stream) => {
-        let video: any = videoRef.current;
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
+  // const getVideo = () => {
+  //   navigator.mediaDevices
+  //     .getUserMedia({
+  //       video: true,
+  //     })
+  //     .then((stream) => {
+  //       let video: any = videoRef.current;
+  //       video.srcObject = stream;
+  //       video.play();
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // };
 
-  useEffect(() => {
-    getVideo();
-  }, [videoRef]);
+  // useEffect(() => {
+  //   getVideo();
+  // }, [videoRef]);
 
-  function dataURLtoBlob(dataurl: any) {
-    var arr = dataurl.split(","),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-  }
+  // function dataURLtoBlob(dataurl: any) {
+  //   var arr = dataurl.split(","),
+  //     mime = arr[0].match(/:(.*?);/)[1],
+  //     bstr = atob(arr[1]),
+  //     n = bstr.length,
+  //     u8arr = new Uint8Array(n);
+  //   while (n--) {
+  //     u8arr[n] = bstr.charCodeAt(n);
+  //   }
+  //   return new Blob([u8arr], { type: mime });
+  // }
 
-  const takePicture = async () => {
-    const width = 200;
-    const height = width / (16 / 9);
-    let video = videoRef.current;
-    let photo: any = photoRef.current;
-    photo.width = width;
-    photo.height = height;
-    let ctx = photo.getContext("2d");
-    ctx.drawImage(video, 0, 0, width, height);
-    //convert image to blob
-    let data = ctx.canvas.toDataURL("image/jpg");
-    const compresedImage: any = await imageCompression(
-      dataURLtoBlob(data) as any,
-      {
-        maxSizeMB: 0.05,
-        useWebWorker: true,
-      }
-    );
-    //compress image
-    setLoginImage(compresedImage);
-  };
+  // const takePicture = async () => {
+  //   const width = 200;
+  //   const height = width / (16 / 9);
+  //   let video = videoRef.current;
+  //   let photo: any = photoRef.current;
+  //   photo.width = width;
+  //   photo.height = height;
+  //   let ctx = photo.getContext("2d");
+  //   ctx.drawImage(video, 0, 0, width, height);
+  //   //convert image to blob
+  //   let data = ctx.canvas.toDataURL("image/jpg");
+  //   const compresedImage: any = await imageCompression(
+  //     dataURLtoBlob(data) as any,
+  //     {
+  //       maxSizeMB: 0.05,
+  //       useWebWorker: true,
+  //     }
+  //   );
+  //   //compress image
+  //   setLoginImage(compresedImage);
+  // };
 
   const handleLogin = async () => {
-    takePicture();
     // tcs@944
     const hashedPassword = btoa(password);
-    const isPasswordCorrect = hashedPassword === "dGNzQDk0NA==";
+    const isPasswordCorrect = hashedPassword === "dGNzQDg0NA==";
     if (isPasswordCorrect) {
       setError(false);
       setIsLoggedIn(true);
     } else {
       setError(true);
-      if (loginImage) {
-        const { data, error } = await supabase.storage
-          .from("login-photos")
-          .upload(
-            `public/failed/failed_${moment().format(
-              "DD-MM-YYYY hh:mm:ss a"
-            )}.jpg`,
-            loginImage
-          );
-      }
+      // if (loginImage) {
+      //   const { data, error } = await supabase.storage
+      //     .from("login-photos")
+      //     .upload(
+      //       `public/failed/failed_${moment().format(
+      //         "DD-MM-YYYY hh:mm:ss a"
+      //       )}.jpg`,
+      //       loginImage
+      //     );
+      // }
     }
   };
 
@@ -101,8 +100,8 @@ const LoginComponent = ({ setIsLoggedIn }: any) => {
           tw="mb-4"
         />
       )}
-      <video ref={videoRef} className="container" tw="display[none]"></video>
-      <canvas className="container" ref={photoRef} tw="display[none]"></canvas>
+      {/* <video ref={videoRef} className="container" tw="display[none]"></video>
+      <canvas className="container" ref={photoRef} tw="display[none]"></canvas> */}
 
       <Input
         size="large"

@@ -121,22 +121,22 @@ const Header = () => {
         />
       ),
     },
-    {
-      path: "login_photos",
-      name: "Login Photos",
-      icon: (
-        <PictureOutlined
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#404040"
-        />
-      ),
-      iconFilled: (
-        <PictureFilled
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#65a9f7"
-        />
-      ),
-    },
+    // {
+    //   path: "login_photos",
+    //   name: "Login Photos",
+    //   icon: (
+    //     <PictureOutlined
+    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+    //       color="#404040"
+    //     />
+    //   ),
+    //   iconFilled: (
+    //     <PictureFilled
+    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
+    //       color="#65a9f7"
+    //     />
+    //   ),
+    // },
   ];
 
   return (
