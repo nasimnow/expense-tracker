@@ -98,6 +98,7 @@ const EditTransactions = () => {
         values[key] = null;
       }
     });
+    values.transaction_date = values?.transaction_date?.format("YYYY-MM-DD");
     setLoading("UPDATE_TRANSACTION");
     const tags = values.tags;
     delete values.tags;
