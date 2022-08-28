@@ -192,7 +192,7 @@ const AddTransactionModal = ({
                 }}
                 style={{ textTransform: "capitalize" }}
               >
-                {categoriesQuery.isSuccess &&
+                {!categoriesQuery.isLoading &&
                   categoriesQuery.data?.map((category: any) => (
                     <Select.Option
                       key={category.id}

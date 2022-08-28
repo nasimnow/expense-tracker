@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Drawer, Form, Input, message, Select, Typography } from "antd";
 import { useState } from "react";
 import {
@@ -28,6 +28,7 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
       message.error(error.message || "Something went wrong");
     } else {
       message.success("Category added successfully");
+      categoriesQuery.refetch();
       categoryForm.resetFields();
       onClose();
     }
