@@ -24,6 +24,8 @@ const AddableSelect = ({
               placeholder="Add New"
               value={newOptionValue}
               onChange={(val) => setNewOptionValue(val.target.value)}
+              autoComplete="off"
+              list="autocompleteOff"
             />
             <Button
               type="primary"

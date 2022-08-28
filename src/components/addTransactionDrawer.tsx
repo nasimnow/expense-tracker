@@ -15,7 +15,7 @@ import {
 import isMobile from "is-mobile";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { addAccount, getAccounts } from "../api/account.api";
 import { getCategories, getSubCategories } from "../api/category.api";
 import { addTags, getTags } from "../api/tag.api";
@@ -37,28 +37,18 @@ const AddTransactionModal = ({
 }: AddTransactionModalProps) => {
   const [loading, setLoading] = useState<string | null>(null);
   const [form] = Form.useForm();
-  const [categories, setCategories] = useState([]);
+
+  const categoriesQuery = useQuery(["categories"], getCategories);
+  const tagsQuery = useQuery(["tags"], getTags);
+  const [accountSearch, setAccountSearch] = useState("");
   const [subCategories, setSubCategories] = useState([]);
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
-  const [tags, setTags] = useState<any>([]);
-  const [accounts, setAccounts] = useState<any>([]);
 
+  const accountsQuery = useQuery(["accounts", accountSearch], () =>
+    getAccounts(accountSearch)
+  );
   const transactionsQuery = useMutation(addTransactions);
-
-  useEffect(() => {
-    getData();
-  }, [visible, addCategoryModalVisible]);
-
-  const getData = async () => {
-    const { data: categories }: any = await getCategories();
-    const { data: tags }: any = await getTags();
-    const { data: accounts }: any = await getAccounts();
-
-    setTags(tags);
-    setAccounts(accounts);
-    setCategories(categories);
-  };
 
   const onFinish = async (values: any) => {
     transactionsQuery.mutate(values);
@@ -72,7 +62,7 @@ const AddTransactionModal = ({
   const addTagAPI = async (tag: string) => {
     setLoading("ADD_TAG");
     const { data = [], error }: any = await addTags(tag);
-    !error && setTags([...tags, ...data]);
+    tagsQuery.refetch();
     const currentTags = form.getFieldValue("tags");
     form.setFieldsValue({ tags: [...currentTags, data[0].id] });
     if (error) message.error("Same tag already exists");
@@ -87,7 +77,7 @@ const AddTransactionModal = ({
     if (error) {
       message.error("Same Account already exists");
     } else {
-      setAccounts([...accounts, ...data]);
+      accountsQuery.refetch();
       form.setFieldsValue({ account_id: data[0].id });
     }
     setLoading(null);
@@ -169,13 +159,13 @@ const AddTransactionModal = ({
             }}
             addButtonLoading={loading === "ADD_ACCOUNT"}
           >
-            {accounts.map((item: any) => (
+            {accountsQuery.data?.map((account: any) => (
               <Select.Option
-                key={item.id}
-                value={item.id}
+                key={account.id}
+                value={account.id}
                 style={{ textTransform: "capitalize" }}
               >
-                {item.name}
+                {account.name}
               </Select.Option>
             ))}
           </AddableSelect>
@@ -189,6 +179,7 @@ const AddTransactionModal = ({
               style={{ marginBottom: "2px" }}
             >
               <Select
+                loading={categoriesQuery.isLoading}
                 placeholder="Category"
                 optionFilterProp="children"
                 showSearch
@@ -201,15 +192,16 @@ const AddTransactionModal = ({
                 }}
                 style={{ textTransform: "capitalize" }}
               >
-                {categories.map((item: any) => (
-                  <Select.Option
-                    key={item.id}
-                    value={item.id}
-                    style={{ textTransform: "capitalize" }}
-                  >
-                    {item.name}
-                  </Select.Option>
-                ))}
+                {categoriesQuery.isSuccess &&
+                  categoriesQuery.data?.map((category: any) => (
+                    <Select.Option
+                      key={category.id}
+                      value={category.id}
+                      style={{ textTransform: "capitalize" }}
+                    >
+                      {category.name}
+                    </Select.Option>
+                  ))}
               </Select>
             </Form.Item>
             <p
@@ -289,7 +281,7 @@ const AddTransactionModal = ({
                 }}
                 addButtonLoading={loading === "ADD_TAG"}
               >
-                {tags.map((item: any) => (
+                {tagsQuery.data?.map((item: any) => (
                   <Select.Option
                     key={item.id}
                     value={item.id}
@@ -301,7 +293,11 @@ const AddTransactionModal = ({
               </AddableSelect>
             </Form.Item>
             <Form.Item name={["invoice_no"]} label="Invoice / Voucher No">
-              <Input placeholder="invoice / voucher no" />
+              <Input
+                placeholder="invoice / voucher no"
+                autoComplete="off"
+                list="autocompleteOff"
+              />
             </Form.Item>
             <Form.Item name={["comment"]} label="Comments">
               <Input.TextArea placeholder="Type Comments Here" />

@@ -1,12 +1,11 @@
-import { Drawer, Form, Input, Button, message, Typography, Select } from "antd";
-import search from "@jukben/emoji-search";
+import { useQuery } from "@tanstack/react-query";
+import { Button, Drawer, Form, Input, message, Select, Typography } from "antd";
+import { useState } from "react";
 import {
   addCategories,
   addSubCategories,
   getCategories,
 } from "../api/category.api";
-import tw from "twin.macro";
-import { useEffect, useState } from "react";
 
 interface AddCategoryModalProps {
   visible: boolean;
@@ -17,23 +16,12 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
   const [categoryForm] = Form.useForm();
   const [subCategoryForm] = Form.useForm();
 
-  const [categories, setCategories] = useState([]);
+  const categoriesQuery = useQuery(["categories"], getCategories);
   const [isCategorySelected, setIsCategorySelected] = useState(false);
 
-  useEffect(() => {
-    getData();
-  }, [visible]);
-
-  const getData = async () => {
-    const { data: categories }: any = await getCategories();
-    setCategories(categories);
-  };
-
   const onCategoryFinish = async (values: any) => {
-    let emojies = search(values.name);
     let categoryObject: any = {
       name: values.name,
-      emoji: emojies.length > 0 ? emojies[0].char : null,
     };
     const { error } = await addCategories(categoryObject);
     if (error) {
@@ -70,7 +58,12 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
       <div tw="flex flex-col gap-6">
         <Form layout="vertical" onFinish={onCategoryFinish} form={categoryForm}>
           <Form.Item name={["name"]} label="Name" rules={[{ required: true }]}>
-            <Input placeholder="Category Name" size="large" />
+            <Input
+              placeholder="Category Name"
+              size="large"
+              autoComplete="off"
+              list="autocompleteOff"
+            />
           </Form.Item>
           <Button type="primary" htmlType="submit" size="large">
             Add Category
@@ -90,6 +83,7 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
             rules={[{ required: true }]}
           >
             <Select
+              loading={categoriesQuery.isLoading}
               optionFilterProp="children"
               showSearch
               size="large"
@@ -97,7 +91,7 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
                 setIsCategorySelected(true);
               }}
             >
-              {categories.map((item: any) => (
+              {categoriesQuery.data?.map((item: any) => (
                 <Select.Option key={item.id} value={item.id}>
                   {item.name}
                 </Select.Option>
@@ -109,6 +103,8 @@ const AddCategoryModal = ({ visible, onClose }: AddCategoryModalProps) => {
               disabled={!isCategorySelected}
               placeholder="Category Name"
               size="large"
+              autoComplete="off"
+              list="autocompleteOff"
             />
           </Form.Item>
           <Button type="primary" htmlType="submit" size="large">

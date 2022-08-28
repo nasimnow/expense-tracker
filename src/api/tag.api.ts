@@ -5,7 +5,8 @@ export const addTags = async (tag: any) => {
 };
 
 export const getTags = async () => {
-  return await supabase.from("tags").select();
+  const response = await supabase.from("tags").select();
+  return response.body;
 };
 
 interface TagTransaction {

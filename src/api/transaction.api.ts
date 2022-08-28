@@ -57,7 +57,7 @@ export const getTransactions = async ({
       }
     )
     .eq("is_deleted", false)
-    .order("id", { ascending: false });
+    .order("transaction_date", { ascending: false });
 
   if (transaction_type) {
     query.eq("type", transaction_type.toUpperCase());

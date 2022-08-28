@@ -1,4 +1,4 @@
-import { Button, DatePicker, Input, List, Select, Tag } from "antd";
+import { Button, DatePicker, Input, List, Select, Spin, Tag } from "antd";
 import moment from "moment";
 import { ReactNode, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -19,15 +19,16 @@ import useZustandStore, {
 } from "../stores/useZustandStore";
 import { getAccounts } from "../api/account.api";
 import { getTags } from "../api/tag.api";
+import captalizeSentance from "../utils/capitalizeSentance";
 
 const getFiltersData = async () => {
   const accounts = await getAccounts();
   const categories = await getCategories();
   const tags = await getTags();
   return {
-    accounts: accounts?.data || [],
-    categories: categories?.data || [],
-    tags: tags?.data || [],
+    accounts: accounts || [],
+    categories: categories || [],
+    tags: tags || [],
   };
 };
 
@@ -59,7 +60,7 @@ const Transactions = () => {
   const scrollPosition = useZustandStore((state) => state.scrollPosition);
   const setScrollPosition = useZustandStore((state) => state.setScrollPosition);
 
-  const getData = async () => {
+  const getTransactionsData = async () => {
     const { from, to } = getPagination(pagination.current, pagination.pageSize);
     //if range is null set a default date
     const { data, error, count } = await getTransactions({
@@ -83,11 +84,8 @@ const Transactions = () => {
     return data;
   };
 
-  const transactionQuery = useQuery<any>(["transactions"], getData);
-
+  const transactionQuery = useQuery<any>(["transactions"], getTransactionsData);
   const filtersDataQuery = useQuery<any>(["filtersData"], getFiltersData);
-
-  const categoriesQuery = useQuery<any>(["categories"], getCategories);
 
   const navigate = useNavigate();
 
@@ -114,14 +112,22 @@ const Transactions = () => {
   const FilterElement = ({
     label,
     element,
+    loading = false,
   }: {
     label: string;
     element: ReactNode;
+    loading?: boolean;
   }) => {
     return (
       <div>
         <div tw="text-xs mb-1">{label}</div>
-        {element}
+        {loading ? (
+          <div tw="w-32 flex justify-center">
+            <Spin />
+          </div>
+        ) : (
+          element
+        )}
       </div>
     );
   };
@@ -168,78 +174,70 @@ const Transactions = () => {
       <div tw="flex gap-3 mb-6 mt-4">
         <FilterElement
           label="Account"
+          loading={!filtersDataQuery.isSuccess}
           element={
             <Select
               placeholder="Account"
               mode="multiple"
               tw="w-36"
               showSearch
-              optionFilterProp="children"
+              optionFilterProp="label"
               value={filter_accounts}
-              onChange={(value) =>
+              onChange={(value: any) =>
                 setTransactionFilters({ filter_accounts: value })
               }
             >
-              {filtersDataQuery.isSuccess &&
-                filtersDataQuery.data.accounts.map((item: any) => {
-                  return (
-                    <Select.Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Select.Option>
-                  );
-                })}
+              {filtersDataQuery?.data?.accounts.map((account: any) => (
+                <Select.Option value={account.id}>
+                  {captalizeSentance(account.name)}
+                </Select.Option>
+              ))}
             </Select>
           }
         />
         <FilterElement
           label="Category"
+          loading={!filtersDataQuery.isSuccess}
           element={
             <Select
               placeholder="Categories"
               mode="multiple"
               tw="w-36"
               showSearch
-              optionFilterProp="children"
+              optionFilterProp="label"
               value={filter_categories}
               onChange={(value) =>
                 setTransactionFilters({ filter_categories: value })
               }
-            >
-              {filtersDataQuery.isSuccess &&
-                filtersDataQuery.data.categories.map((item: any) => {
-                  return (
-                    <Select.Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Select.Option>
-                  );
-                })}
-            </Select>
+              options={filtersDataQuery?.data?.categories.map(
+                (category: any) => ({
+                  label: captalizeSentance(category.name),
+                  value: category.id,
+                })
+              )}
+            />
           }
         />
 
         <FilterElement
           label="Tag"
+          loading={!filtersDataQuery.isSuccess}
           element={
             <Select
               placeholder="Tags"
               showSearch
-              optionFilterProp="children"
+              optionFilterProp="label"
               mode="multiple"
               tw="w-36"
               value={filter_tags}
               onChange={(value: number[]) =>
                 setTransactionFilters({ filter_tags: value })
               }
-            >
-              {filtersDataQuery.isSuccess &&
-                filtersDataQuery.data.tags.map((item: any) => {
-                  return (
-                    <Select.Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Select.Option>
-                  );
-                })}
-            </Select>
+              options={filtersDataQuery?.data?.tags.map((tag: any) => ({
+                label: captalizeSentance(tag.name),
+                value: tag.id,
+              }))}
+            />
           }
         />
         <FilterElement

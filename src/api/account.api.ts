@@ -1,7 +1,9 @@
 import supabase from "../utils/supabase";
 
 export const addAccount = async (account: any) => {
-  return await supabase.from("accounts").insert(account);
+  return await supabase
+    .from("accounts")
+    .insert({ ...account, name: account.name.toLowerCase() });
 };
 
 export const getAccounts = async (search = "" as any) => {
@@ -11,7 +13,8 @@ export const getAccounts = async (search = "" as any) => {
   if (search) {
     query.ilike("name", `%${search}%`);
   }
-  return await query;
+  const response = await query;
+  return response.body;
 };
 
 export const getSingleAccount = async (id: number) => {
