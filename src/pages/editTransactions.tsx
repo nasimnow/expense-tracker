@@ -1,4 +1,5 @@
 import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 import {
   Button,
   Col,
@@ -33,20 +34,21 @@ const EditTransactions = () => {
   const transactionId: string = useLocation().pathname.split("/")[2];
   const [loading, setLoading] = useState<string | null>(null);
   const [form] = Form.useForm();
-  const [categories, setCategories] = useState([]);
-  const [tags, setTags] = useState<any>([]);
-  const [accounts, setAccounts] = useState<any>([]);
-
   const [subCategories, setSubCategories] = useState([]);
   const [addCategoryModalVisible, setAddCategoryModalVisible] =
     useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<any>(null);
+
+  const accountsQuery = useQuery<any>(["accounts"], () => getAccounts(""));
+  const categoriesQuery = useQuery(["categories"], () => getCategories());
+  const tagsQuery = useQuery(["tags"], () => getTags());
+
   const navigate = useNavigate();
 
   const addTagAPI = async (tag: string) => {
     setLoading("ADD_TAG");
     const { data = [], error }: any = await addTags(tag);
-    !error && setTags([...tags, ...data]);
+    tagsQuery.refetch();
     const currentTags = form.getFieldValue("tags");
     form.setFieldsValue({ tags: [...currentTags, data[0].id] });
 
@@ -56,21 +58,10 @@ const EditTransactions = () => {
 
   useEffect(() => {
     setLoading("UPDATE_TRANSACTION");
-    getCategoriesData();
 
     if (transactionId) getTransactionData();
     setLoading(null);
   }, [transactionId]);
-
-  const getCategoriesData = async () => {
-    const { data: categories }: any = await getCategories();
-    const { data: tags }: any = await getTags();
-    const { data: accounts }: any = await getAccounts();
-
-    setTags(tags);
-    setAccounts(accounts);
-    setCategories(categories);
-  };
 
   const getTransactionData = async () => {
     let { data }: any = await getSingleTransaction(Number(transactionId));
@@ -131,7 +122,6 @@ const EditTransactions = () => {
     if (error) {
       message.error("Same Account already exists");
     } else {
-      setAccounts([...accounts, ...data]);
       form.setFieldsValue({ account_id: data[0].id });
     }
     setLoading(null);
@@ -190,7 +180,7 @@ const EditTransactions = () => {
               addButtonLoading={loading === "ADD_ACCOUNT"}
               allowClear
             >
-              {accounts.map((item: any) => (
+              {accountsQuery?.data?.map((item: any) => (
                 <Select.Option
                   key={item.id}
                   value={item.id}
@@ -237,7 +227,7 @@ const EditTransactions = () => {
                   allowClear
                   onClear={() => form.setFieldsValue({ sub_category: null })}
                 >
-                  {categories.map((item: any) => (
+                  {categoriesQuery?.data?.map((item: any) => (
                     <Select.Option
                       key={item.id}
                       value={item.id}
@@ -318,7 +308,7 @@ const EditTransactions = () => {
               }}
               addButtonLoading={loading === "ADD_TAG"}
             >
-              {tags.map((item: any) => (
+              {tagsQuery?.data?.map((item: any) => (
                 <Select.Option
                   key={item.id}
                   value={item.id}

@@ -14,7 +14,7 @@ export const getAccounts = async (search = "" as any) => {
     query.ilike("name", `%${search}%`);
   }
   const response = await query;
-  return response.body;
+  return response?.body;
 };
 
 export const getSingleAccount = async (id: number) => {
