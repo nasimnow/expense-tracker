@@ -6,27 +6,23 @@ import { CategoriesCard } from "../styles/catogories.style";
 import { CloseOutline } from "react-ionicons";
 import { Popconfirm, Button, message, List } from "antd";
 import { Category } from "../types/categories.types";
+import { useQuery } from "@tanstack/react-query";
 
 const Categories = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+
+  const {
+    data: categories,
+    isLoading,
+    refetch,
+  } = useQuery(["categories"], getCategories);
 
   useEffect(() => {
-    getData();
-  }, []);
-  useEffect(() => {
     if (!isModalVisible) {
-      getData();
+      refetch();
     }
   }, [isModalVisible]);
 
-  const getData = async () => {
-    setLoading(true);
-    const { data }: any = await getCategories();
-    setCategories(data);
-    setLoading(false);
-  };
   return (
     <>
       <AddCategoryModal
@@ -45,8 +41,8 @@ const Categories = () => {
       </div>
       <List
         grid={{ xs: 1, lg: 3 }}
-        loading={loading}
-        dataSource={categories}
+        loading={isLoading}
+        dataSource={categories || []}
         renderItem={(item: Category) => (
           <CategoriesCard key={item.id}>
             <div tw="flex items-center capitalize">
@@ -61,7 +57,7 @@ const Categories = () => {
                   message.error(error.message || "Something went wrong");
                 else {
                   message.success("Category deleted successfully");
-                  getData();
+                  refetch();
                 }
               }}
             >

@@ -12,7 +12,7 @@ const Accounts = () => {
   const navigate = useNavigate();
   const accountSearch = useZustandStore((state) => state.accountSearch);
   const setAccountSearch = useZustandStore((state) => state.setAccountSearch);
-  const accountsQuery = useQuery<any>(["accounts"], () =>
+  const accountsQuery = useQuery<any>(["accounts", accountSearch], () =>
     getAccounts(accountSearch)
   );
 
@@ -32,7 +32,7 @@ const Accounts = () => {
       />
       <List
         loading={accountsQuery.isLoading}
-        dataSource={accountsQuery.data?.data}
+        dataSource={accountsQuery.data}
         renderItem={(item: any) => (
           <AccountsCard
             key={item.id}

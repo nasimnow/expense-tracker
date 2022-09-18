@@ -15,6 +15,7 @@ interface ITransactionFilters {
   filter_type?: null | "income" | "expense";
   filter_date_range?: TDateRange;
   filter_search?: string;
+  filter_sort_by?: "transaction_date" | "created_at";
 }
 
 export const defaultFilterValues: ITransactionFilters = {
@@ -25,6 +26,7 @@ export const defaultFilterValues: ITransactionFilters = {
   filter_type: null,
   filter_date_range: [null, null],
   filter_search: "",
+  filter_sort_by: "transaction_date",
 };
 
 interface IState {

@@ -52,6 +52,7 @@ const Transactions = () => {
     filter_type,
     filter_date_range,
     filter_search,
+    filter_sort_by,
   } = transactionFilters;
 
   const isAddDrawer = useZustandStore((state) => state.isAddDrawer);
@@ -79,6 +80,7 @@ const Transactions = () => {
       account_ids: filter_accounts,
       tag_ids: filter_tags,
       transaction_type: filter_type,
+      sortBy: filter_sort_by,
     });
     setPagination({ total: count });
     return data;
@@ -257,7 +259,23 @@ const Transactions = () => {
             </Select>
           }
         />
-
+        <FilterElement
+          label="Sort By"
+          element={
+            <Select
+              tw="w-36"
+              onChange={(value) =>
+                setTransactionFilters({ filter_sort_by: value })
+              }
+              value={filter_sort_by}
+            >
+              <Select.Option value="transaction_date">
+                Transaction Date
+              </Select.Option>
+              <Select.Option value="created_at">Created Date</Select.Option>
+            </Select>
+          }
+        />
         <Button
           type={
             deepEqual(transactionFilters, defaultFilterValues)
@@ -324,7 +342,7 @@ const Transactions = () => {
               <div tw="flex flex-col">
                 <div className="money">
                   {item.type === "INCOME" ? "+" : "-"}
-                  {item.amount}
+                  {item.amount.toFixed(2)}
                 </div>
                 <p tw="text-gray-500 text-xs">
                   {item.comment} -{" "}

@@ -35,6 +35,7 @@ interface TransactionParams {
   account_ids: number[] | undefined;
   tag_ids?: number[] | undefined;
   transaction_type?: "expense" | "income" | null | undefined;
+  sortBy?: "transaction_date" | "created_at";
 }
 
 export const getTransactions = async ({
@@ -47,6 +48,7 @@ export const getTransactions = async ({
   account_ids,
   tag_ids,
   transaction_type,
+  sortBy,
 }: TransactionParams) => {
   const query = supabase
     .from("transactions")
@@ -56,11 +58,13 @@ export const getTransactions = async ({
         count: "exact",
       }
     )
-    .eq("is_deleted", false)
-    .order("transaction_date", { ascending: false });
+    .eq("is_deleted", false);
 
   if (transaction_type) {
     query.eq("type", transaction_type.toUpperCase());
+  }
+  if (sortBy) {
+    query.order(sortBy, { ascending: false });
   }
 
   if (from && to) {
