@@ -183,7 +183,7 @@ const Transactions = () => {
               mode="multiple"
               tw="w-36"
               showSearch
-              optionFilterProp="label"
+              optionFilterProp="children"
               value={filter_accounts}
               onChange={(value: any) =>
                 setTransactionFilters({ filter_accounts: value })

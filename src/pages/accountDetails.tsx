@@ -95,7 +95,7 @@ const AccountDetails = () => {
         <h2 tw="font-medium text-base"> Account Details</h2>
       </div>
       <h2 tw="font-medium text-2xl mb-6">
-        {accountQuery.isSuccess && accountQuery.data.data[0].name}
+        {accountQuery.isSuccess && accountQuery.data.name}
       </h2>
       <div tw="w-6">
         <Select
@@ -111,7 +111,7 @@ const AccountDetails = () => {
             All
           </Select.Option>
           {categoriesQuery.isSuccess &&
-            categoriesQuery?.data.data.map((item: any) => {
+            categoriesQuery?.data.map((item: any) => {
               return (
                 <Select.Option key={item.id} value={item.id}>
                   {item.name}
