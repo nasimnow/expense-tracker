@@ -55,11 +55,8 @@ const Transactions = () => {
     filter_sort_by,
   } = transactionFilters;
 
-  const isAddDrawer = useZustandStore((state) => state.isAddDrawer);
-  const setIsAddDrawer = useZustandStore((state) => state.setIsAddDrawer);
-
-  const scrollPosition = useZustandStore((state) => state.scrollPosition);
-  const setScrollPosition = useZustandStore((state) => state.setScrollPosition);
+  const { isAddDrawer, setIsAddDrawer } = useZustandStore();
+  const { scrollPosition, setScrollPosition } = useZustandStore();
 
   const getTransactionsData = async () => {
     const { from, to } = getPagination(pagination.current, pagination.pageSize);
@@ -98,12 +95,6 @@ const Transactions = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pagination.current]);
-
-  useEffect(() => {
-    if (!isAddDrawer) {
-      transactionQuery.refetch();
-    }
-  }, [isAddDrawer]);
 
   useEffect(() => {
     if (scrollPosition) {
@@ -291,7 +282,7 @@ const Transactions = () => {
 
       <div tw="p-3 bg-white rounded-lg">
         <List
-          loading={transactionQuery.isFetching}
+          loading={transactionQuery.isLoading}
           dataSource={transactionQuery.data}
           pagination={{
             onChange: (page) => {

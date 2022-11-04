@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Col,
@@ -32,6 +32,8 @@ import captalizeSentance from "../utils/capitalizeSentance";
 
 const EditTransactions = () => {
   const transactionId: string = useLocation().pathname.split("/")[2];
+  const queryClient = useQueryClient();
+
   const [loading, setLoading] = useState<string | null>(null);
   const [form] = Form.useForm();
   const [subCategories, setSubCategories] = useState([]);
@@ -104,6 +106,7 @@ const EditTransactions = () => {
       await editTransactionTags(Number(transactionId), tags);
       message.success("Transaction updated successfully");
       navigate("/transactions");
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     }
     setLoading(null);
   };
@@ -111,6 +114,7 @@ const EditTransactions = () => {
   const deleteTransactionAPI = async () => {
     await deleteTransaction(Number(transactionId));
     message.success("Transaction deleted successfully");
+    queryClient.invalidateQueries({ queryKey: ["transactions"] });
     navigate("/transactions");
   };
 

@@ -1,16 +1,16 @@
-import { PictureFilled, PictureOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import { Avatar, Button } from "antd";
 import { useEffect, useState } from "react";
-import { Card, FileTrayStacked, Home, People } from "react-ionicons";
+import { Card, Home } from "react-ionicons";
 import { useLocation, useNavigate } from "react-router-dom";
 import tw, { styled } from "twin.macro";
-import useLocalStorage from "../hooks/useLocalStorage";
+import useZustandStore from "../stores/useZustandStore";
 
 const Header = () => {
   const [selectedPage, setSelectedPage] = useState("");
   const pathname = useLocation().pathname.split("/")[1];
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useLocalStorage("isLoggedIn", true);
+  const { loggedInUser, setLoggedInUser } = useZustandStore();
 
   interface NavItemProps {
     selected: boolean;
@@ -59,84 +59,15 @@ const Header = () => {
     {
       path: "transactions",
       name: "Transactions",
-      icon: (
-        <Card
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#404040"
-        />
-      ),
-      iconFilled: (
-        <Card
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#65a9f7"
-        />
-      ),
+      icon: <Card color="#404040" />,
+      iconFilled: <Card color="#65a9f7" />,
     },
     {
       path: "overview",
       name: "Overview",
-      icon: (
-        <Home
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#404040"
-        />
-      ),
-      iconFilled: (
-        <Home
-          // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-          color="#65a9f7"
-        />
-      ),
+      icon: <Home color="#404040" />,
+      iconFilled: <Home color="#65a9f7" />,
     },
-    // {
-    //   path: "accounts",
-    //   name: "Accounts",
-    //   icon: (
-    //     <People
-    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-    //       color="#404040"
-    //     />
-    //   ),
-    //   iconFilled: (
-    //     <People
-    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-    //       color="#65a9f7"
-    //     />
-    //   ),
-    // },
-
-    // {
-    //   path: "categories",
-    //   name: "Categories",
-    //   icon: (
-    //     <FileTrayStacked
-    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-    //       color="#404040"
-    //     />
-    //   ),
-    //   iconFilled: (
-    //     <FileTrayStacked
-    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-    //       color="#65a9f7"
-    //     />
-    //   ),
-    // },
-    // {
-    //   path: "login_photos",
-    //   name: "Login Photos",
-    //   icon: (
-    //     <PictureOutlined
-    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-    //       color="#404040"
-    //     />
-    //   ),
-    //   iconFilled: (
-    //     <PictureFilled
-    //       // css={[tw`sm:w-5 sm:h-5 md:w-8 md:h-8 grid place-items-center`]}
-    //       color="#65a9f7"
-    //     />
-    //   ),
-    // },
   ];
 
   return (
@@ -158,12 +89,21 @@ const Header = () => {
             </NavItem>
           ))}
         </div>
+        <div tw="flex gap-4 mt-6 items-center">
+          <Avatar size={50} tw="bg-red-600 uppercase">
+            {loggedInUser?.slice(0, 2)}
+          </Avatar>
+          <div>
+            <p tw="capitalize text-xl font-bold">{loggedInUser}</p>
+            <p>Logged in</p>
+          </div>
+        </div>
         <Button
-          tw="mt-10"
+          tw="mt-5"
           size="large"
           danger
           onClick={() => {
-            setIsLoggedIn(false);
+            setLoggedInUser(null);
             location.reload();
           }}
         >

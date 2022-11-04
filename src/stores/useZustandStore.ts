@@ -41,9 +41,15 @@ interface IState {
   setAccountSearch: (accountSearch: string) => void;
   transactionFilters: ITransactionFilters;
   setTransactionFilters: (transactionFilters: ITransactionFilters) => void;
+  loggedInUser: string | null;
+  setLoggedInUser: (user: string | null) => void;
 }
 
 const useZustandStore = create<IState>((set) => ({
+  loggedInUser: null,
+  setLoggedInUser: (loggedInUser) => {
+    set((state) => ({ loggedInUser }));
+  },
   scrollPosition: 0,
   setScrollPosition: (scrollPosition) =>
     set({

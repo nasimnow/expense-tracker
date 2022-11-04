@@ -14,6 +14,7 @@ const AddableSelect = ({
 
   return (
     <Select
+      allowClear
       {...props}
       dropdownRender={(menu) => (
         <div>

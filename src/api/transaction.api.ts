@@ -4,10 +4,7 @@ import { addTransactionTags } from "./tag.api";
 export const addTransactions = async (transaction: any) => {
   try {
     let tags = transaction.tags;
-    console.log(
-      "🚀 ~ file: transaction.api.ts ~ line 7 ~ addTransactions ~ tags",
-      tags
-    );
+
     delete transaction.tags;
     const response: any = await supabase
       .from("transactions")

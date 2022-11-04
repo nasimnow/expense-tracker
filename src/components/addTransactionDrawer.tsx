@@ -15,7 +15,7 @@ import {
 import isMobile from "is-mobile";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addAccount, getAccounts } from "../api/account.api";
 import { getCategories, getSubCategories } from "../api/category.api";
 import { addTags, getTags } from "../api/tag.api";
@@ -25,6 +25,7 @@ import captalizeSentance from "../utils/capitalizeSentance";
 import AddableSelect from "./AddableSelect";
 import AddCategoryModal from "./addCategoryModal";
 import "twin.macro";
+import useZustandStore from "../stores/useZustandStore";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -37,7 +38,9 @@ const AddTransactionModal = ({
 }: AddTransactionModalProps) => {
   const [loading, setLoading] = useState<string | null>(null);
   const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
+  const { loggedInUser, setLoggedInUser } = useZustandStore();
   const categoriesQuery = useQuery(["categories"], getCategories);
   const tagsQuery = useQuery(["tags"], getTags);
   const [accountSearch, setAccountSearch] = useState("");
@@ -48,11 +51,19 @@ const AddTransactionModal = ({
   const accountsQuery = useQuery(["accounts", accountSearch], () =>
     getAccounts(accountSearch)
   );
-  const transactionsQuery = useMutation(addTransactions);
+  const transactionCreateMutation = useMutation(addTransactions, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+  });
 
   const onFinish = async (values: any) => {
-    transactionsQuery.mutate(values);
-    if (transactionsQuery.isError) message.error("Something went wrong");
+    transactionCreateMutation.mutate({
+      ...values,
+      created_by: loggedInUser || "rahman",
+    });
+    if (transactionCreateMutation.isError)
+      message.error("Something went wrong");
     else {
       message.success("Transaction added successfully");
       form.resetFields();
@@ -308,7 +319,7 @@ const AddTransactionModal = ({
           type="primary"
           htmlType="submit"
           size="large"
-          loading={transactionsQuery.isLoading}
+          loading={transactionCreateMutation.isLoading}
         >
           Submit
         </Button>

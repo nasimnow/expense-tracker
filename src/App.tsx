@@ -1,3 +1,4 @@
+import { Modal } from "antd";
 import { useEffect } from "react";
 import {
   BrowserRouter,
@@ -7,17 +8,12 @@ import {
   useLocation,
 } from "react-router-dom";
 import tw, { styled } from "twin.macro";
+import LoginComponent from "./components/LoginComponent";
 import Header from "./components/Sidebar";
-import AccountDetails from "./pages/accountDetails";
-import Accounts from "./pages/accounts";
-import Categories from "./pages/categories";
 import EditTransactions from "./pages/editTransactions";
 import Home2 from "./pages/overview";
 import Transactions from "./pages/transactions";
-import useLocalStorage from "./hooks/useLocalStorage";
-import { Modal } from "antd";
-import LoginComponent from "./components/LoginComponent";
-import LoginPhotos from "./pages/LoginPhotos";
+import useZustandStore from "./stores/useZustandStore";
 
 const MainContainer = styled.div`
   @media (min-width: 768px) {
@@ -41,14 +37,14 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useLocalStorage("isLoggedIn", false);
+  const { loggedInUser, setLoggedInUser } = useZustandStore();
 
   return (
     <BrowserRouter>
       <ScrollToTop />
       <Header />
-      <Modal closable={false} visible={!isLoggedIn} footer={null} centered>
-        <LoginComponent setIsLoggedIn={setIsLoggedIn} />
+      <Modal closable={false} visible={!loggedInUser} footer={null} centered>
+        <LoginComponent setLoggedInUser={setLoggedInUser} />
       </Modal>
       <MainContainer>
         <Routes>
@@ -56,11 +52,6 @@ const App = () => {
           <Route path="/overview" element={<Home2 />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/transactions/:id" element={<EditTransactions />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/accounts" element={<Accounts />} />
-          <Route path="/accounts/:id" element={<AccountDetails />} />
-
-          <Route path="/login_photos" element={<LoginPhotos />} />
         </Routes>
       </MainContainer>
     </BrowserRouter>

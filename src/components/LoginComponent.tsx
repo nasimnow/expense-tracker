@@ -1,15 +1,22 @@
 import { Alert, Button, Input, Typography } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import "twin.macro";
-import imageCompression from "browser-image-compression";
 
-import supabase from "../utils/supabase";
-import moment from "moment";
+const users = [
+  {
+    username: "jobin",
+    hashedPassword: "am9iaW4xMjM=",
+  },
+  {
+    username: "rahman",
+    hashedPassword: "dGNzQDg0NA==",
+  },
+];
 
-const LoginComponent = ({ setIsLoggedIn }: any) => {
+const LoginComponent = ({ setLoggedInUser }: any) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
-  const [loginImage, setLoginImage] = useState(null);
+  const [userName, setUserName] = useState<null | string>(null);
 
   let photoRef = useRef(null);
   let videoRef = useRef(null);
@@ -69,11 +76,14 @@ const LoginComponent = ({ setIsLoggedIn }: any) => {
 
   const handleLogin = async () => {
     // tcs@944
+    // password hashed in base64
     const hashedPassword = btoa(password);
-    const isPasswordCorrect = hashedPassword === "dGNzQDg0NA==";
+    const isPasswordCorrect =
+      hashedPassword ===
+      users.find((user) => user.username === userName)?.hashedPassword;
     if (isPasswordCorrect) {
       setError(false);
-      setIsLoggedIn(true);
+      setLoggedInUser(userName);
     } else {
       setError(true);
       // if (loginImage) {
@@ -90,11 +100,11 @@ const LoginComponent = ({ setIsLoggedIn }: any) => {
   };
 
   return (
-    <div>
+    <div tw="flex flex-col gap-4">
       <Typography.Title level={3}>Login</Typography.Title>
       {error && (
         <Alert
-          message="Password is incorrect"
+          message="Username / Password is incorrect"
           type="error"
           showIcon
           tw="mb-4"
@@ -102,6 +112,12 @@ const LoginComponent = ({ setIsLoggedIn }: any) => {
       )}
       {/* <video ref={videoRef} className="container" tw="display[none]"></video>
       <canvas className="container" ref={photoRef} tw="display[none]"></canvas> */}
+      <Input
+        size="large"
+        placeholder="Username"
+        value={userName || ""}
+        onChange={(e) => setUserName(e.target.value)}
+      />
 
       <Input
         size="large"
