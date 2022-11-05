@@ -2,6 +2,7 @@
   "name": "expense-tracker",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://albanan-expense.vercel.app",
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
