@@ -1,25 +1,25 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button, DatePicker, Input, List, Select, Spin, Tag } from "antd";
+import deepEqual from "deep-equal";
 import moment from "moment";
 import { ReactNode, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import "twin.macro";
-import deepEqual from "deep-equal";
 
-import { getCategories, getSubCategories } from "../api/category.api";
+import { getAccounts } from "../api/account.api";
+import { getCategories } from "../api/category.api";
+import { getTags } from "../api/tag.api";
 import { getTransactions } from "../api/transaction.api";
 import AddTransactionDrawer from "../components/addTransactionDrawer";
 import { DateRanges, DATE_FORMAT } from "../constants";
-import { TransactionCard } from "../styles/transactions.style.";
-import { ITransaction } from "../types/transactions.types";
-import getPagination from "../utils/getPagination";
-import getUniqueColor from "../utils/getUniqueColor";
 import useZustandStore, {
   defaultFilterValues,
 } from "../stores/useZustandStore";
-import { getAccounts } from "../api/account.api";
-import { getTags } from "../api/tag.api";
+import { TransactionCard } from "../styles/transactions.style.";
+import { ITransaction } from "../types/transactions.types";
 import captalizeSentance from "../utils/capitalizeSentance";
+import getPagination from "../utils/getPagination";
+import getUniqueColor from "../utils/getUniqueColor";
 
 const getFiltersData = async () => {
   const accounts = await getAccounts();
@@ -33,8 +33,6 @@ const getFiltersData = async () => {
 };
 
 const Transactions = () => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-
   const pagination = useZustandStore((state) => state.pagination);
   const setPagination = useZustandStore((state) => state.setPagination);
 
@@ -90,7 +88,7 @@ const Transactions = () => {
 
   useEffect(() => {
     transactionQuery.refetch();
-  }, [pagination.current, transactionFilters, filter_search, selectedCategory]);
+  }, [pagination.current, transactionFilters, filter_search]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -181,7 +179,7 @@ const Transactions = () => {
               }
             >
               {filtersDataQuery?.data?.accounts.map((account: any) => (
-                <Select.Option value={account.id}>
+                <Select.Option value={account.id} key={account.id}>
                   {captalizeSentance(account.name)}
                 </Select.Option>
               ))}
@@ -282,6 +280,7 @@ const Transactions = () => {
 
       <div tw="p-3 bg-white rounded-lg">
         <List
+          rowKey="id"
           loading={transactionQuery.isLoading}
           dataSource={transactionQuery.data}
           pagination={{
@@ -318,6 +317,7 @@ const Transactions = () => {
                     }`}</span>
                     {item.transaction_tags.map((item: any) => (
                       <Tag
+                        key={item.id}
                         color={getUniqueColor(item.tags.name)}
                         style={{ fontSize: "10px" }}
                       >
