@@ -14,7 +14,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       manifest: {
         display: "fullscreen",
-        start_url: ".",
+        start_url: "/transactions",
         name: "Albanan Expense",
         short_name: "Albanan",
         icons: [

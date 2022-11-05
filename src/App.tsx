@@ -48,7 +48,7 @@ const App = () => {
       </Modal>
       <MainContainer>
         <Routes>
-          {/* <Route path="/" element={<Navigate to="/transactions" />} /> */}
+          <Route path="/" element={<Navigate to="/transactions" />} />
           <Route path="/overview" element={<Home2 />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/transactions/:id" element={<EditTransactions />} />
