@@ -66,7 +66,9 @@ const AddTransactionModal = ({
       message.error("Something went wrong");
     else {
       message.success("Transaction added successfully");
+      const transaction_date = form.getFieldValue("transaction_date");
       form.resetFields();
+      form.setFieldsValue({ transaction_date });
     }
   };
 
