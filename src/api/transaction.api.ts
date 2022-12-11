@@ -71,9 +71,7 @@ export const getTransactions = async ({
     query.in("category", category_ids);
   }
   if (search) {
-    query.or(
-      `comment.ilike.%${search}%,invoice_no.ilike.%${search}%,amount.ilike.%${search}%`
-    );
+    query.or(`comment.ilike.%${search}%,invoice_no.ilike.%${search}%`);
   }
   if (startDate && endDate) {
     query.lte("transaction_date", endDate).gte("transaction_date", startDate);
