@@ -20,6 +20,7 @@ import { ITransaction } from "../types/transactions.types";
 import captalizeSentance from "../utils/capitalizeSentance";
 import getPagination from "../utils/getPagination";
 import getUniqueColor from "../utils/getUniqueColor";
+import { useExcelDownloder } from "react-xls";
 
 const getFiltersData = async () => {
   const accounts = await getAccounts();
@@ -35,6 +36,7 @@ const getFiltersData = async () => {
 const Transactions = () => {
   const pagination = useZustandStore((state) => state.pagination);
   const setPagination = useZustandStore((state) => state.setPagination);
+  const { ExcelDownloder, Type } = useExcelDownloder();
 
   const transactionFilters = useZustandStore(
     (state) => state.transactionFilters
@@ -139,6 +141,46 @@ const Transactions = () => {
         >
           Add New Transaction
         </Button>
+        {transactionQuery.data && (
+          <ExcelDownloder
+            type={Type.Button}
+            data={{
+              Transactions: transactionQuery.data.map((transaction: any) => {
+                return {
+                  date: moment(transaction.transaction_date).format(
+                    "DD-MM-YYYY"
+                  ),
+                  category: `${transaction?.accounts?.name || ""}${
+                    (transaction?.categories.name &&
+                      `${transaction?.categories.name} - `) ||
+                    ""
+                  }${
+                    (transaction?.sub_categories?.name &&
+                      `${transaction?.sub_categories?.name} - `) ||
+                    ""
+                  }`,
+                  income:
+                    transaction.type === "INCOME"
+                      ? transaction.amount.toFixed(2)
+                      : "",
+                  expense:
+                    transaction.type === "EXPENSE"
+                      ? transaction.amount.toFixed(2)
+                      : "",
+                  tags: transaction.transaction_tags
+                    .map((item: any) => item.tags.name)
+                    .join(", "),
+                  account: transaction.account,
+                  comments: transaction.comment,
+                };
+              }),
+            }}
+          >
+            <Button type="primary" size="large">
+              Download Excel
+            </Button>
+          </ExcelDownloder>
+        )}
       </div>
 
       <div tw="flex mb-2 justify-between">
